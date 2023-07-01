@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-# This file is part of rosgpt package.
-#
-# Copyright (c) 2023 Anis Koubaa.
-# All rights reserved.
-#
-# This work is licensed under the terms of the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
-# International Public License. See https://creativecommons.org/licenses/by-nc-sa/4.0/ for details.
-
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -15,8 +6,11 @@ import copy
 import math
 import rclpy 
 from rclpy.node import Node
-from geometry_msgs.msg import Twist 
-from turtlesim.msg import Pose
+from geometry_msgs.msg import Twist, Vector3
+
+
+# Now, twist_msg.linear.x is x, twist_msg.linear.y is y, twist_msg.linear.z is z
+from geometry_msgs.msg import Pose
 import time
 from rclpy.executors import SingleThreadedExecutor
 import threading
@@ -83,6 +77,8 @@ class DroneController(Node):
                 linear_speed = cmd['params'].get('linear_speed', 0.2)
                 distance = cmd['params'].get('distance', 1.0)
                 direction = cmd['params'].get('direction', "forward")
+
+                print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
                 
                 # METHOD: Create a thread executor
                 # we need to run the method on a different thread to avoid blocking rclpy.spin. 
@@ -106,73 +102,117 @@ class DroneController(Node):
 
 
     def get_distance(self, start, destination):
-        return math.sqrt(((destination.x - start.x) ** 2) + ((destination.y - start.y) ** 2) + ((destination.z - start.z) ** 2))
-        
+        return math.sqrt(
+            ((destination.position.x - start.position.x) ** 2) +
+            ((destination.position.y - start.position.y) ** 2) +
+            ((destination.position.z - start.position.z) ** 2)
+        )
+
     def move(self, linear_speed, distance, direction): 
         print(f'Start moving the drone {direction} at {linear_speed} m/s for a distance of {distance} meters')
 
-        if any(abs(speed) > 1.0 for speed in linear_speed):
+        if abs(linear_speed) > 1.0:
             print('[ERROR]: The speed in any direction must be lower than 1.0!')
             return -1
+        
+        
+        linear_vector = Vector3()
+
+        try: 
+            if direction == "forward":
+                linear_vector.x = linear_speed
+                linear_vector.y = 0.0
+                linear_vector.z = 0.0
+
+            elif direction == "backward":
+                linear_vector.x = -linear_speed
+                linear_vector.y = 0.0
+                linear_vector.z = 0.0
+            elif direction == "left":
+                linear_vector.x = 0.0
+                linear_vector.y = linear_speed
+                linear_vector.z = 0.0
+            elif direction == "right":
+                linear_vector.x = 0.0
+                linear_vector.y = -linear_speed
+                linear_vector.z = 0.0
+            elif direction == "up":
+                linear_vector.x = 0.0
+                linear_vector.y = 0.0
+                linear_vector.z = linear_speed
+            elif direction == "down":
+                linear_vector.x = 0.0
+                linear_vector.y = 0.0
+                linear_vector.z = -linear_speed
+
+        except Exception as e:
+            print('[Exception] An unexpected error occurred:', str(e))
 
         twist_msg = Twist()
-        twist_msg.linear.x = linear_speed[0]
-        twist_msg.linear.y = linear_speed[1]
-        twist_msg.linear.z = linear_speed[2]
+        twist_msg.linear = linear_vector
 
-        start_pose = copy.copy(self.pose)
+        try:
+            start_pose = copy.copy(self.pose)
 
-        while self.get_distance(start_pose, self.pose) < distance:
-            print('distance moved: ', self.get_distance(start_pose, self.pose))
-            self.velocity_publisher.publish(twist_msg)
-            self.move_executor.spin_once(timeout_sec=0.1)
+            print('start_pose: ', start_pose)
+            print('current_pose: ', self.pose)
+            while self.get_distance(start_pose, self.pose) < distance:
+
+                print('distance moved: ', self.get_distance(start_pose, self.pose))
+
+                self.velocity_publisher.publish(twist_msg)
+                self.move_executor.spin_once(timeout_sec=0.5)
+        except Exception as e:
+
+            print('[Exception] An unexpected error occurred:', str(e))
 
         twist_msg.linear.x = 0.0
         twist_msg.linear.y = 0.0
         twist_msg.linear.z = 0.0
+
+        print("Stopping the drone ...")
+
         self.velocity_publisher.publish(twist_msg)
 
-        print('distance moved: ', self.get_distance(start_pose, self.pose))
+        # print('distance moved: ', self.get_distance(start_pose, self.pose))
         print('The Robot has stopped...')
 
-        #self.move_executor.remove_node(self)
-        #return 0
 
 
 
-    def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
-        print('Start Rotating the Robot ...')
-        #rclpy.spin_once(self)
-        twist_msg=Twist()
-        angular_speed_degree=abs(angular_speed_degree) #make sure it is a positive relative angle
-        if (angular_speed_degree>30) :
-            print (angular_speed_degree)
-            print('[ERROR]: The rotation speed must be lower than 0.5!')
-            return -1
+    # def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
+    #     print('Start Rotating the Robot ...')
+    #     #rclpy.spin_once(self)
+    #     twist_msg=Twist()
+    #     angular_speed_degree=abs(angular_speed_degree) #make sure it is a positive relative angle
+    #     if (angular_speed_degree>30) :
+    #         print (angular_speed_degree)
+    #         print('[ERROR]: The rotation speed must be lower than 0.5!')
+    #         return -1
         
-        angular_speed_radians = math.radians(angular_speed_degree)
-        twist_msg.angular.z = -abs(angular_speed_radians) if clockwise else abs(angular_speed_radians)
-        twist_msg.angular.z = abs(angular_speed_radians) * (-1 if clockwise else 1)
+    #     angular_speed_radians = math.radians(angular_speed_degree)
+    #     twist_msg.angular.z = -abs(angular_speed_radians) if clockwise else abs(angular_speed_radians)
+    #     twist_msg.angular.z = abs(angular_speed_radians) * (-1 if clockwise else 1)
 
-        start_pose = copy.copy(self.pose)
+    #     start_pose = copy.copy(self.pose)
         
-        #rclpy.spin_once(self)
+    #     #rclpy.spin_once(self)
 
-        rotated_related_angle_degree=0.0
+    #     rotated_related_angle_degree=0.0
 
-        while rotated_related_angle_degree<desired_relative_angle_degree:
-            #rclpy.spin_once(self)
-            self.velocity_publisher.publish(twist_msg)
-            #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
-            rotated_related_angle_degree = math.degrees(abs(start_pose.theta - self.pose.theta))
-            #rclpy.spin_once(self)
+    #     while rotated_related_angle_degree<desired_relative_angle_degree:
+    #         #rclpy.spin_once(self)
+    #         self.velocity_publisher.publish(twist_msg)
+    #         #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
+    #         rotated_related_angle_degree = math.degrees(abs(start_pose.theta - self.pose.theta))
+    #         #rclpy.spin_once(self)
             
-            #rclpy.spin_once(self)
-            time.sleep(0.01)
-        #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
-        twist_msg.angular.z = 0.0
-        self.velocity_publisher.publish(twist_msg)
-        print('The Robot has stopped...')
+    #         #rclpy.spin_once(self)
+    #         time.sleep(0.01)
+    #     #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
+    #     twist_msg.angular.z = 0.0
+    #     self.velocity_publisher.publish(twist_msg)
+    #     print('The Robot has stopped...')
 
         #return 0
 

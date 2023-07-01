@@ -158,7 +158,9 @@ class ROSGPTProxy(Resource):
                     {"action": "move", "params": {"linear_speed": linear_speed, "distance": distance, "direction": direction}}
 
                     The 'direction' parameter can take values "forward", "backward", "left", "right", "up", "down" to indicate the direction of movement. Here are some examples.
-
+                    
+                    if speed is not given in the prompt, it is assumed to be 0.5 meters per second.
+                    all numerical answers should be in float form
                     prompt: "Move forward for 1 meter at a speed of 0.5 meters per second."
                     returns: {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}
 
