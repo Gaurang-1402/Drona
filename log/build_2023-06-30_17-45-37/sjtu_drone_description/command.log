@@ -1,2 +1,0 @@
-Invoking command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description -- -j24 -l24
-Invoked command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description' returned '2': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description -- -j24 -l24

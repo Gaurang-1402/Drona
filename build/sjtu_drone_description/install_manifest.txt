@@ -1,3 +1,0 @@
-/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/lib/libplugin_drone.so
-/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/export_sjtu_drone_descriptionExport.cmake
-/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/export_sjtu_drone_descriptionExport-noconfig.cmake

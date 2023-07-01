@@ -28,7 +28,7 @@ setup(
         'console_scripts': [
             'spawn_drone = sjtu_drone_bringup.spawn_drone:main',
             'rosgpt = sjtu_drone_bringup.rosgpt:main',
-            'rosgptparser_turtlesim = sjtu_drone_bringup.rosgptparser_turtlesim:main',
+            'rosgptparser_drone = sjtu_drone_bringup.rosgptparser_drone:main',
             'rosgpt_client_node = sjtu_drone_bringup.rosgpt_client_node:main',
 
         ],
