@@ -1,0 +1,4 @@
+source;share/sjtu_drone_description/local_setup.bash
+source;share/sjtu_drone_description/local_setup.dsv
+source;share/sjtu_drone_description/local_setup.sh
+source;share/sjtu_drone_description/local_setup.zsh

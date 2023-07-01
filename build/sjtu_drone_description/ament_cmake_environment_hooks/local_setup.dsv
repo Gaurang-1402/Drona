@@ -1,0 +1,3 @@
+source;share/sjtu_drone_description/environment/ament_prefix_path.sh
+source;share/sjtu_drone_description/environment/library_path.sh
+source;share/sjtu_drone_description/environment/path.sh

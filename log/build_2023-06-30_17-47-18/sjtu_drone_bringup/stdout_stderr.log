@@ -1,0 +1,39 @@
+running develop
+running egg_info
+creating sjtu_drone_bringup.egg-info
+writing sjtu_drone_bringup.egg-info/PKG-INFO
+writing dependency_links to sjtu_drone_bringup.egg-info/dependency_links.txt
+writing entry points to sjtu_drone_bringup.egg-info/entry_points.txt
+writing requirements to sjtu_drone_bringup.egg-info/requires.txt
+writing top-level names to sjtu_drone_bringup.egg-info/top_level.txt
+writing manifest file 'sjtu_drone_bringup.egg-info/SOURCES.txt'
+reading manifest file 'sjtu_drone_bringup.egg-info/SOURCES.txt'
+writing manifest file 'sjtu_drone_bringup.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/python3.10/site-packages/sjtu-drone-bringup.egg-link (link to .)
+Installing spawn_drone script to /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/sjtu_drone_bringup
+
+Installed /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup
+running install_data
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/ament_index
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/ament_index/resource_index
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/ament_index/resource_index/packages
+copying resource/sjtu_drone_bringup -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/ament_index/resource_index/packages
+copying package.xml -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/launch
+copying launch/sjtu_drone_gazebo.launch.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/launch
+copying launch/sjtu_drone_bringup.launch.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/launch
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/rviz
+copying rviz/rviz.rviz -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/rviz
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/webapp
+copying webapp/style.css -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/webapp
+copying webapp/main.js -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/webapp
+copying webapp/script.js -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/webapp
+copying webapp/index.html -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/webapp
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/scripts
+copying scripts/rosgptparser_turtlesim.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/scripts
+copying scripts/rosgpt_client_node.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/scripts
+copying scripts/rosgpt.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/scripts
+copying scripts/rosgpt_client.py -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/scripts
+creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/prompts
+copying prompts/prompts.txt -> /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/share/sjtu_drone_bringup/prompts

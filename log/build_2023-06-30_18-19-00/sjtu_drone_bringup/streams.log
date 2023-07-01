@@ -1,0 +1,20 @@
+[1.072s] Invoking command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup': PYTHONPATH=/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup/prefix_override:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup/build --no-deps install_data
+[1.478s] running develop
+[1.762s] running egg_info
+[1.763s] writing sjtu_drone_bringup.egg-info/PKG-INFO
+[1.763s] writing dependency_links to sjtu_drone_bringup.egg-info/dependency_links.txt
+[1.764s] writing entry points to sjtu_drone_bringup.egg-info/entry_points.txt
+[1.764s] writing requirements to sjtu_drone_bringup.egg-info/requires.txt
+[1.764s] writing top-level names to sjtu_drone_bringup.egg-info/top_level.txt
+[1.765s] reading manifest file 'sjtu_drone_bringup.egg-info/SOURCES.txt'
+[1.773s] writing manifest file 'sjtu_drone_bringup.egg-info/SOURCES.txt'
+[1.775s] running build_ext
+[1.775s] Creating /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/python3.10/site-packages/sjtu-drone-bringup.egg-link (link to .)
+[1.776s] Installing rosgpt script to /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/sjtu_drone_bringup
+[1.776s] Installing rosgpt_client_node script to /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/sjtu_drone_bringup
+[1.776s] Installing rosgptparser_turtlesim script to /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/sjtu_drone_bringup
+[1.777s] Installing spawn_drone script to /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/sjtu_drone_bringup
+[1.777s] 
+[1.777s] Installed /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup
+[1.777s] running install_data
+[1.822s] Invoked command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup' returned '0': PYTHONPATH=/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup/prefix_override:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --editable --build-directory /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_bringup/build --no-deps install_data

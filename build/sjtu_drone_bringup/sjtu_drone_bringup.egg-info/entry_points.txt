@@ -1,0 +1,6 @@
+[console_scripts]
+rosgpt = sjtu_drone_bringup.rosgpt:main
+rosgpt_client_node = sjtu_drone_bringup.rosgpt_client_node:main
+rosgptparser_turtlesim = sjtu_drone_bringup.rosgptparser_turtlesim:main
+spawn_drone = sjtu_drone_bringup.spawn_drone:main
+

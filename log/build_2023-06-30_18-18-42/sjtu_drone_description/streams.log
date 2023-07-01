@@ -1,0 +1,40 @@
+[0.557s] Invoking command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup:/opt/ros/humble /usr/bin/cmake --build /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description -- -j24 -l24
+[0.751s] [100%] Built target plugin_drone
+[0.765s] Invoked command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup:/opt/ros/humble /usr/bin/cmake --build /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description -- -j24 -l24
+[0.830s] Invoking command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup:/opt/ros/humble /usr/bin/cmake --install /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description
+[0.836s] -- Install configuration: ""
+[0.837s] -- Execute custom install script
+[0.837s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/include/pid_controller.h
+[0.837s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/include/plugin_drone.h
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/library_path.sh
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/library_path.dsv
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/database.config
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/model.config
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/quadrotor_4.dae
+[0.838s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/quadrotor_4.stl
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/sjtu_drone.sdf
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/urdf/sjtu_drone.urdf
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/urdf/sjtu_drone.urdf.xacro
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/worlds/playground.world
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/ament_index/resource_index/package_run_dependencies/sjtu_drone_description
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/ament_index/resource_index/parent_prefix_path/sjtu_drone_description
+[0.839s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/ament_prefix_path.sh
+[0.840s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/ament_prefix_path.dsv
+[0.840s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/path.sh
+[0.840s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/environment/path.dsv
+[0.841s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/local_setup.bash
+[0.841s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/local_setup.sh
+[0.841s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/local_setup.zsh
+[0.841s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/local_setup.dsv
+[0.841s] -- Symlinking: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/package.dsv
+[0.849s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/ament_index/resource_index/packages/sjtu_drone_description
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/ament_cmake_export_include_directories-extras.cmake
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/ament_cmake_export_libraries-extras.cmake
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/ament_cmake_export_targets-extras.cmake
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/sjtu_drone_descriptionConfig.cmake
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/sjtu_drone_descriptionConfig-version.cmake
+[0.850s] -- Up-to-date symlink: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/package.xml
+[0.851s] -- Up-to-date: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/lib/libplugin_drone.so
+[0.851s] -- Up-to-date: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/export_sjtu_drone_descriptionExport.cmake
+[0.851s] -- Up-to-date: /home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/cmake/export_sjtu_drone_descriptionExport-noconfig.cmake
+[0.854s] Invoked command in '/home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_bringup:/opt/ros/humble /usr/bin/cmake --install /home/chief-of-mischief/Desktop/drone_ws/build/sjtu_drone_description
