@@ -8,24 +8,88 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <style>
     /* Override Materialize default button color to use Material-UI blue color */
-    .btn,
-    .btn-large {
-      background-color: #007bff;
-    }
+    body {
+  background-color: #121212;
+  color: #1db954;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+  border: 1px solid #1db954;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+h1 {
+  color: #1db954;
+  text-shadow: 0 0 10px #1db954, 0 0 20px #1db954, 0 0 30px #1db954, 0 0 40px #1db954;
+}
+
+.btn, .btn-large {
+  background-color: #1db954;
+  color: #121212;
+}
+
+#output {
+  border: 1px solid #1db954;
+  padding: 1rem;
+  min-height: 100px;
+  max-height: 200px;
+  overflow: auto;
+  margin-bottom: 1rem;
+  text-align: left;
+  background-color: #121212;
+  color: #1db954;
+}
+
+#input {
+  border: 1px solid #1db954;
+  padding: 1rem;
+  min-height: 100px;
+  max-height: 200px;
+  overflow: auto;
+  margin-bottom: 1rem;
+  text-align: left;
+  background-color: #121212;
+  color: #1db954;
+}
+
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>RobotGPT</h1>
-    <p>Click the "Start Recording" button and speak your command. Then click the "Stop Recording" button to convert it
-      to speech. Finally, click the "Send to Robot" button to send the voice command to the robot.</p>
-    <a id="startBtn" class="btn-large waves-effect waves-light" onclick="startRecording()">Start Recording</a>
-    <a id="stopBtn" class="btn-large waves-effect waves-light" onclick="stopRecording()">Stop Recording</a>
-    <a id="sendBtn" class="btn-large waves-effect waves-light" onclick="sendToRobot()">Send to Robot</a>
-    <div id="output" class="flow-text"></div>
-  </div>
+    <h1>ChatDrone</h1>
 
+    <h4>Suggested commands</h4>
+
+    <ul>
+      <li><h6>"Move forward for 1 meter at a speed of 0.5 meters per second."</h6></li>
+      <li><h6>"Move backward for 2 meters at a speed of 0.7 meters per second."</h6></li>
+      <li><h6>"Move left for 3 meters at a speed of 0.6 meters per second."</h6></li>
+      <li><h6>"Move right for 4 meters at a speed of 0.5 meters per second."</h6></li>
+      <li><h6>"Move up for 1 meter at a speed of 0.3 meters per second."</h6></li>
+      <li><h6>"Move down for 2 meters at a speed of 0.4 meters per second."</h6></li>
+      <li><h6>"Take off."</h6></li>
+      <li><h6>"Land."</h6></li>
+      <li><h6>German:</h  6></li>
+      <li><h6>"Bewegen Sie sich vorwärts für 1 Meter mit einer Geschwindigkeit von 0,5 Metern pro Sekunde."</h6></li>
+      <li><h6>Japanese:</h6></li>
+      <li><h6>"Mae ni 1 meter, 0.5 meters per second no sokudo de susumu."</h6></li>
+      <li><h6>Hindi:</h6></li>
+      <li><h6>"Aage badho 1 meter, 0.5 meters per second ke liye."</h6></li>
+    </ul>
+    
+  
+</div>
+<div class="container">
+  <a id="sendBtnInput" class="btn-large waves-effect waves-light" >Send command to the Robot</a>
+  <textarea id="input" class="flow-text"></textarea>
+</div>
+  
   <!-- Add Material-UI JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -34,88 +98,42 @@
     // Global variables
     let recognition;
     let outputDiv;
+    let inputDiv;
+    let isRecording = false;
 
-    // Initialize the Web Speech API
-    function initialize() {
-      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.interimResults = true;
-      recognition.continuous = true;
-      recognition.lang = 'en-US';
-
-      recognition.onresult = function (event) {
-        let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            // Append final transcript to output div
-            outputDiv.innerHTML += '<p>' + event.results[i][0].transcript + '</p>';
-          } else {
-            // Append interim transcript to output div
-            interimTranscript += event.results[i][0].transcript;
-          }
-        }
-
-        // Display interim transcript in output div
-        outputDiv.innerHTML = interimTranscript;
-      };
-
-      recognition.onerror = function (event) {
-        console.error('Recognition error:', event.error);
-      };
-    }
-
- // Start recording
-    function startRecording() {
-      outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = '';
-      recognition.start();
-    }
-
-    // Stop recording
-    function stopRecording() {
-      recognition.stop();
-    }
     
+    // Send to robot
+    async function sendInputToRobot() {
+      let command = inputDiv.value;
 
-    // Speak the given text
-function speak(text) {
-  let utterance = new SpeechSynthesisUtterance(text);
-  // Initialize the TTS engine
-    let tts_engine = new SpeechSynthesisUtterance();
-    tts_engine.text = text//"Message received. Sending to ChatGPT.";
-    window.speechSynthesis.speak(tts_engine);
+      console.log("command being sent to robot:", command);
 
-  tts_engine.speak(utterance.text);
-}
-// Send to robot
-async function sendToRobot() {
-  let command = outputDiv.innerHTML;
+      // Send the voice command to the robot for further processing
+      try {
+        let response = await fetch("http://localhost:5000/rosgpt", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+         
+          body: new URLSearchParams({
+            text_command: command
+          }),
+        });
 
-  // Send the voice command to the robot for further processing
-  try {
-    let response = await fetch("http://localhost:5000/rosgpt", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-     
-      body: new URLSearchParams({
-        text_command: command
-      }),
-    });
+        let jsonResponse = await response.json();
+        console.log("Received response from robot:", jsonResponse);
+      } catch (error) {
+        console.error("Error sending command to robot:", error);
+      }
+    }
 
-    let jsonResponse = await response.json();
-    console.log("Received response from robot:", jsonResponse);
-    outputDiv.innerHTML += '<p>Robot response: ' + jsonResponse.response + '</p>';
-    speak("Robot response: " + jsonResponse.response);
-  } catch (error) {
-    console.error("Error sending command to robot:", error);
-  }
-}
-
-// Initialize the app
-window.onload = function () {
-  initialize();
-};
+    // Initialize the app
+    window.onload = function () {
+        // Add event listeners to buttons
+  document.getElementById('sendBtnInput').addEventListener('click', sendInputToRobot);
+  inputDiv = document.getElementById('input');
+    };
   </script>
 </body>
 </html>
