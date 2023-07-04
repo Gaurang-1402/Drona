@@ -110,7 +110,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-nosetests.xml
+nosetests.xmlspeak
 coverage.xml
 *.cover
 .hypothesis/
@@ -341,3 +341,10 @@ doc/
 
 ## Setting files
 *.settings
+
+
+build
+
+install
+
+log

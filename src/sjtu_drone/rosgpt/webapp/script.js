@@ -63,7 +63,7 @@ async function sendToRobot() {
 
   // Send the voice command to the robot for further processing
   try {
-    let response = await fetch("http://localhos:5000/chatgpt", {
+    let response = await fetch("http://localhost:5000/chatgpt", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
