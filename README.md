@@ -1,6 +1,9 @@
 # ChatDrones
 ✈️ Drones controlled by plain English
 
+
+## Running ROSGPT
+
 ```
 source install/setup.sh
 ros2 run rosgpt rosgpt
@@ -15,6 +18,8 @@ ros2 run rosgpt rosgpt_client_node
 source install/setup.sh
 ros2 run rosgpt rosgptparser_drone 
 ```
+
+## Running the simulation
 
 ```
 source install/setup.sh
