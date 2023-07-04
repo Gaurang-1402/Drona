@@ -2,22 +2,22 @@
 ✈️ Drones controlled by plain English
 
 ```
-source install install/setup.sh
- ros2 run rosgpt rosgpt
+source install/setup.sh
+ros2 run rosgpt rosgpt
 ```
 
 ```
-source install install/setup.sh
+source install/setup.sh
 ros2 run rosgpt rosgpt_client_node 
 ```
 
 ```
-source install install/setup.sh
- ros2 run rosgpt rosgptparser_drone 
+source install/setup.sh
+ros2 run rosgpt rosgptparser_drone 
 ```
 
 ```
-source install install/setup.sh
+source install/setup.sh
 ros2 launch  sjtu_drone_bringup sjtu_drone_bringup.launch.py
 ```
 
