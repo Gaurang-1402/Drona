@@ -6,8 +6,13 @@ Key features include:
 
 - A user-friendly web application that provides an interactive interface for drone control
 - Ability to initiate drone landing and takeoff through simple natural language commands
+[![output-onlinegiftools-14-1.gif](https://i.postimg.cc/rsQSKyS4/output-onlinegiftools-14-1.gif)](https://postimg.cc/hQQJYBZ4)
 - Full control over the drone's directional movement, including forward, backward, left, and right commands
+[![output-onlinegiftools-16-1.gif](https://i.postimg.cc/KjHR61P0/output-onlinegiftools-16-1.gif)](https://postimg.cc/64CWR51Z)
 - Support for commands in multiple languages
+
+[![output-onlinegiftools-17-1.gif](https://i.postimg.cc/qvXpntNW/output-onlinegiftools-17-1.gif)](https://postimg.cc/mPkxWgNS)
+
 
 
 ## ROSGPT Architecture
