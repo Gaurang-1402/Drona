@@ -57,6 +57,16 @@ class DroneController(Node):
         land_msg = Empty()
         self.land_publisher.publish(land_msg)
 
+    def stop(self):
+        vel_msg = Twist()
+        vel_msg.linear.x = 0.0
+        vel_msg.linear.y = 0.0
+        vel_msg.linear.z = 0.0
+        vel_msg.angular.x = 0.0
+        vel_msg.angular.y = 0.0
+        vel_msg.angular.z = 0.0
+        self.velocity_publisher.publish(vel_msg)
+
 
     #this callback represents the ROSGPTParser. It takes a JSON, parses it, and converts it to a ROS 2 command
     def voice_cmd_callback(self, msg):
@@ -72,6 +82,9 @@ class DroneController(Node):
 
             elif cmd['action'] == 'land':
                 self.thread_executor.submit(self.land)
+                
+            elif cmd['action'] == 'stop':
+                self.thread_executor.submit(self.stop)
 
             elif cmd['action'] == 'move':
                 linear_speed = cmd['params'].get('linear_speed', 0.2)
