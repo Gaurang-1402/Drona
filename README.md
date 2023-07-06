@@ -1,6 +1,10 @@
 # ChatDrones: Control Drones with Natural Language
 
-ChatDrones showcases the power of Language Logic Models (LLMs) by allowing users to control drones using simple, natural language instructions. The system currently operates within a simulated environment for testing and development purposes.
+ChatDrones is a project that integrates Language Logic Models (LLMs) with drone control. This setup allows users to **command drones using simple, everyday language.** The project uses the ROS2 (Robot Operating System) Humble and runs simulations in the Gazebo environment, providing a reliable platform for drone behavior.
+
+ChatDrones also includes a web application with a user-friendly interface, making it easy for users to input commands. This combines the benefits of advanced technology with a simple and easy-to-use design.
+
+Currently, ChatDrones operates within a simulated environment, serving as a practical platform for testing and development. However, it's also designed to work with real drones, translating natural language instructions into actual drone commands.
 
 Key features include:
 
