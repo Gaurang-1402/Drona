@@ -33,6 +33,7 @@ RUN source /opt/ros/humble/setup.bash \
 
 EXPOSE 5000
 
+# TODO - Create this script separately and copy it in
 # Create a script to run the Flask app
 RUN echo "#!/bin/bash" > /ros2_ws/start_flask_app.sh
 RUN echo "source install/setup.sh" >> /ros2_ws/start_flask_app.sh
