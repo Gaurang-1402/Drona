@@ -190,9 +190,6 @@ class DroneController(Node):
         # print('distance moved: ', self.get_distance(start_pose, self.pose))
         print('The Robot has stopped...')
 
-
-
-
     # def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
     #     print('Start Rotating the Robot ...')
     #     #rclpy.spin_once(self)

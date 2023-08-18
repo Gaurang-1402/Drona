@@ -65,6 +65,7 @@ class ROSGPTNode(Node):
         super().__init__('chatgpt_ros2_node')
         # Create a publisher for the 'voice_cmd' topic with a message queue size of 10
         self.publisher = self.create_publisher(String, 'voice_cmd', 10)
+        
 
     def publish_message(self, message):
         """
