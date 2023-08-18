@@ -20,6 +20,7 @@ from flask_cors import CORS
 import pyttsx3  # pip install pyttsx3 #you need to install libespeak1 on Ubuntu # sudo apt-get install libespeak1
 from rclpy.executors import SingleThreadedExecutor
 import subprocess
+from geometry_msgs.msg import Pose
 
 from ament_index_python import get_package_share_directory
 
@@ -61,22 +62,54 @@ class ROSGPTNode(Node):
         """
         Initialize the ROSGPTNode class which is derived from the rclpy Node class.
         """
-        # Call the superclass constructor and pass the name of the node
         super().__init__('chatgpt_ros2_node')
-        # Create a publisher for the 'voice_cmd' topic with a message queue size of 10
         self.publisher = self.create_publisher(String, 'voice_cmd', 10)
+        
+        # Subscribe to the 'position_data' topic
+        self.subscription = self.create_subscription(
+            Pose, 
+            'position_data', 
+            self.position_callback, 
+            10)
+        
+        self.subscription
+        self.position = None  # Initialize the position attribute to None
 
     def publish_message(self, message):
         """
         Publish the given message to the 'voice_cmd' topic.
-        Args:
-            message (str): The message to be published.
+
+        Parameters
+        ----------
+        message : str
+            The message to be published.
         """
-        msg = String() # Create a new String message 
-        msg.data = message # Convert the message to a JSON string and set the data field of the message
-        self.publisher.publish(msg) # Publish the message using the publisher 
-        #print('message Published: ', message) # Log the published message
-        #print('msg.data Published: ', msg.data) # Log the published message
+        msg = String()
+        msg.data = message
+        self.publisher.publish(msg)
+
+    def position_callback(self, msg):
+        """
+        Callback function that gets executed whenever a new position message is received.
+
+        Parameters
+        ----------
+        msg : PointStamped
+            The received message containing position data.
+        """
+        self.position = (msg.point.x, msg.point.y, msg.point.z)
+
+    def get_loc(self):
+        """
+        Return the latest position data received by the subscriber.
+
+        Returns
+        -------
+        tuple or None
+            The latest position data in the form (x, y, z), or None if no position data has been received.
+        """
+        return self.position
+
         
         
 
