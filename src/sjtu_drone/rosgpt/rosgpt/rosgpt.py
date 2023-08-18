@@ -213,7 +213,6 @@ class ROSGPTProxy(Resource):
         
         # Extract the GPT-3 model response from the returned JSON
         chatgpt_response = response.choices[0].message['content'].strip()
-        #print(chatgpt_response)
         # Find the start and end indices of the JSON string in the response
         start_index = chatgpt_response.find('{')
         end_index = chatgpt_response.rfind('}') + 1
@@ -238,12 +237,12 @@ class ROSGPTProxy(Resource):
         # Run the speak function on a separate thread
         #print('text_command:', text_command,'\n')
         chatgpt_response = self.askGPT(text_command)
-        print ('[ROSGPT] Response received from ChatGPT. \n', str(json.loads(chatgpt_response))[:60], '...')
-        #print('eval(chatgpt_response)', eval(chatgpt_response))
-        # Run the speak function on a separate thread
-
         if chatgpt_response is None:
             return {'error': 'An error occurred while processing the request'}
+        else:
+            print ('[ROSGPT] Response received from ChatGPT. \n', str(json.loads(chatgpt_response))[:60], '...')
+        #print('eval(chatgpt_response)', eval(chatgpt_response))
+        # Run the speak function on a separate thread
 
         threading.Thread(target=process_and_publish_chatgpt_response, args=(self.chatgpt_ros2_node, text_command, chatgpt_response, True)).start()
         #print(json.loads(chatgpt_response))
