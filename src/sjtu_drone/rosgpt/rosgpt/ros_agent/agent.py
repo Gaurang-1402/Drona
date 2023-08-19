@@ -5,7 +5,9 @@ from . import LLM
 
 
 def load_agent():
-    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English.  
+    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English. 
+
+    If what you are given is not a command, or is not relevant for managing the drone, you should ignore it return a message saying so.
 
     First, you must think about what the command means. If there are multiple steps in the command, you must plan out
     each step for the drone to follow sequentially. You may only command the drone to move, land, or takeoff. 
@@ -36,7 +38,8 @@ def load_agent():
     Command: {input}
     Thought: {agent_scratchpad}"""
 
-    PARSING_ERROR_PROMPT = """Make sure you output an array where each element is a JSON object. Each JSON object should have the following format:
+
+    PARSING_ERROR_PROMPT = """If you're returning a list of commands, make sure you output an array where each element is a JSON object. Each JSON object should have the following format:
 
     ```TypeScript
 
@@ -44,12 +47,13 @@ def load_agent():
     action: string // The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`.
     params: { // 
     linear_speed: number // The linear speed of the drone in meters per second. The default value is 0.1. This value must be between 0 and 1.
-    distance: number // The distance to move in meters. This value must be between -1 and 1. The default value is 0.1.
+    distance: number // The distance to move in meters. This value must be a float. The default value is 0.1.
     direction: string // The direction to move in. This can be one of `forward`, `backward`, `left`, `right`, `up`, `down`.
     }
     }
     ```
 
+    If you're returning a message, just return the string.
     """
 
     tools = [CustomCommandToJSON()]

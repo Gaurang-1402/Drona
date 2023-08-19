@@ -15,8 +15,7 @@ class MoveParams(BaseModel):
     
     distance: float = Field(
         ...,
-        description="The distance to move in meters. This value must be between -1 and 1. The default value is 0.1.", 
-        ge=-1, le=1)
+        description="The distance to move in meters. This value must be a float. The default value is 0.1.")
     
     direction: str = Field(
         ..., 
