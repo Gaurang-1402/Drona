@@ -98,7 +98,7 @@ class ROSGPTNode(Node):
         msg : PointStamped
             The received message containing position data.
         """
-        self.position = (msg.point.x, msg.point.y, msg.point.z)
+        self.position = (msg.position.x, msg.position.y, msg.position.z)
 
     def get_loc(self):
         """

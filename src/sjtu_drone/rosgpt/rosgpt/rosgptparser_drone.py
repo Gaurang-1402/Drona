@@ -8,7 +8,10 @@ import rclpy
 from math import atan2
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Vector3
+import logging
 
+# Configure the logger
+logging.basicConfig(level=logging.ERROR)
 
 # Now, twist_msg.linear.x is x, twist_msg.linear.y is y, twist_msg.linear.z is z
 from geometry_msgs.msg import Pose
@@ -91,9 +94,6 @@ class DroneController(Node):
     def voice_cmd_callback(self, msg):
         #print(msg.data)
         try:
-            # cmd = json.loads(msg.data)
-            # cmd = json.loads(cmd['json']) #we only consider the pure json message. cmd['text'] contains a mix of text and json
-            # print('JSON command received: \n',cmd,'\n')
 
             print(msg.data)
 
@@ -115,9 +115,9 @@ class DroneController(Node):
                     self.thread_executor.submit(self.stop)
 
                 elif cmd["action"] == 'move':
-                    linear_speed = cmd["action"]["params"].get('linear_speed', 0.2)
-                    distance = cmd["action"]["params"].get('distance', 1.0)
-                    direction = cmd["action"]["params"].get('direction', "forward")
+                    linear_speed = cmd["params"].get('linear_speed', 0.2)
+                    distance = cmd["params"].get('distance', 1.0)
+                    direction = cmd["params"].get('direction', "forward")
 
                     print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
                     
@@ -136,10 +136,10 @@ class DroneController(Node):
                 #     self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
                     # self.rotate(angular_velocity, angle, is_clockwise)
 
-        except json.JSONDecodeError:
-            print('[json.JSONDecodeError] Invalid or empty JSON string received:', msg.data)
+        except json.JSONDecodeError as e:
+            logging.exception('[json.JSONDecodeError] Invalid or empty JSON string received: %s', msg.data)
         except Exception as e:
-            print('[Exception] An unexpected error occurred:', str(e))   
+            logging.exception('[Exception] An unexpected error occurred: %s', str(e)) 
 
 
     def get_distance(self, start, destination):
@@ -190,9 +190,6 @@ class DroneController(Node):
         except Exception as e:
             print('[Exception] An unexpected error occurred:', str(e))
 
-        print("Stopping the drone ...")
-        self.stop()
-
         twist_msg = Twist()
         twist_msg.linear = linear_vector
 
@@ -205,12 +202,11 @@ class DroneController(Node):
 
                 print('distance moved: ', self.get_distance(start_pose, self.pose))
 
-                self.velocity_msg = twist_msg
+                self.velocity_publisher.publish(twist_msg)
                 self.move_executor.spin_once(timeout_sec=0.5)
         except Exception as e:
 
             print('[Exception] An unexpected error occurred:', str(e))
-        
 
         twist_msg.linear.x = 0.0
         twist_msg.linear.y = 0.0
@@ -222,6 +218,7 @@ class DroneController(Node):
 
         # print('distance moved: ', self.get_distance(start_pose, self.pose))
         print('The Robot has stopped...')
+
 
     def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
         print('Start Rotating the Robot ...')
