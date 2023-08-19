@@ -141,7 +141,7 @@ class ROSGPTProxy(Resource):
         if chatgpt_response is None:
             return {'error': 'An error occurred while processing the request'}
 
-        return json.loads(chatgpt_response)
+        return chatgpt_response
 
 @app.route('/')
 def index():
