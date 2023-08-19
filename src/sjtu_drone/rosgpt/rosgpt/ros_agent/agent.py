@@ -7,17 +7,13 @@ from . import LLM
 def load_agent():
     PREFIX = f"""You are an interpreter for a drone. You will be given a command in English. 
 
-    If what you are given is not a command, or is not relevant for managing the drone, you should ignore it return a message saying so.
+    If what you are given is not a command, or is not relevant for managing the drone, you should ignore it and return a message saying so.
 
-    First, you must think about what the command means. If there are multiple steps in the command, you must plan out
-    each step for the drone to follow sequentially. You may only command the drone to move, land, or takeoff. 
-    If you command it to move, you must specify the direction, distance, and speed.
+    First, you must think about what the command means. If there are multiple steps in the command, you must plan out each step for the drone to follow sequentially. You may only command the drone to move, rotate, land, stop, or takeoff. If you command it to move, you must specify the direction, distance, and speed.
 
-    After you have planned out the steps, you must format each step into a JSON object that the drone can understand. You should
-    use the command_to_json tool to help you. Note: you may only pass a single command to the tool at a time. 
+    After you have planned out the steps, you must format each step into a JSON object that the drone can understand. You should use the command_to_json tool to help you. Note: you may only pass a single command to the tool at a time. 
 
-    Once you have finished formatting all the commands, you should return a string formatted json object containing all the JSON
-    formatted commands. The drone will then execute the commands in sequential order. The output should follow this format:
+    Once you have finished formatting all the commands, you should return a string formatted json object containing all the JSON formatted commands. The drone will then execute the commands in sequential order. The output should follow this format:
 
     '[json_command_1, json_command_2, ...]'
 
@@ -51,9 +47,62 @@ def load_agent():
     direction: string // The direction to move in. This can be one of `forward`, `backward`, `left`, `right`, `up`, `down`.
     }
     }
+
     ```
 
     If you're returning a message, just return the string.
+
+
+    Example:
+
+    prompt = '''
+    Consider the following ontology:
+    {"action": "land", "params": {}}
+    {"action": "takeoff", "params": {}}
+    {"action": "move", "params": {"linear_speed": linear_speed, "distance": distance, "direction": direction}}
+
+    You may get a command in another language, translate it to English and then create the JSON.
+
+    The 'direction' parameter can take values "forward", "backward", "left", "right", "up", "down" to indicate the direction of movement. Here are some examples.
+
+    If speed is not given in the prompt, it is assumed to be 0.5 meters per second.
+    All numerical answers should be in float form.
+
+    Command: "takeoff and Move forward for 1 meter at a speed of 0.5 meters per second."
+    Thought: The command instructs the drone to takeoff first and then move forward for a specific distance and speed.
+    Action: Convert to JSON format
+    Action Input: "takeoff and Move forward for 1 meter at a speed of 0.5 meters per second."
+    Observation: [{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}]
+    Thought: I have broken the command out into discrete steps for the drone to follow formatted in the appropriate way.
+    Final Answer: '[{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}]'
+    '''    
+
+    prompt = '''Command: "Land."
+        Thought: The command instructs the drone to land.
+        Action: Convert to JSON format
+        Action Input: "Land."
+        Observation: {"action": "land", "params": {}}
+        Thought: I have converted the command into a JSON format suitable for the drone.
+        Final Answer: '[{"action": "land", "params": {}}]'
+    '''
+    Note: The "Example" is just a demonstration of how the instructions are utilized in a practical scenario. It's not the exact execution but a representation.
+
+    Command: "Takeoff, move forward for 3 meters, then land."
+    Thought: The command instructs the drone to takeoff, move forward, and then land.
+    Action: Convert to JSON format
+    Action Input: "Takeoff, move forward for 3 meters, then land."
+    Observation: [{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 3, "direction": "forward"}}, {"action": "land", "params": {}}]
+    Thought: I have broken the command into discrete steps for the drone.
+    Final Answer: '[{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 3, "direction": "forward"}}, {"action": "land", "params": {}}]'
+
+    Command: "Move left for 2 meters, move upwards for 1 meter, then stop."
+    Thought: The command instructs the drone to move left, then move upwards, followed by a stop.
+    Action: Convert to JSON format
+    Action Input: "Move left for 2 meters, move upwards for 1 meter, then stop."
+    Observation: [{"action": "move", "params": {"linear_speed": 0.5, "distance": 2, "direction": "left"}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "up"}}, {"action": "stop", "params": {}}]
+    Thought: I have parsed the commands sequentially for the drone.
+    Final Answer: '[{"action": "move", "params": {"linear_speed": 0.5, "distance": 2, "direction": "left"}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "up"}}, {"action": "stop", "params": {}}]'
+
     """
 
     tools = [CustomCommandToJSON()]
