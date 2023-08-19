@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field, validator
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from std_msgs.msg import String
-from .ros_agent.tools import CustomCommandToJSON
+from .ros_agent.agent import load_agent
 
 # Instantiate a Flask application object with the given name
 app = Flask(__name__)
@@ -56,16 +56,6 @@ def get_poi_location(point_of_interest: str) -> tuple:
         'kitchen': (2, 2, 2)
         }
     return poi_map[point_of_interest]
-
-def load_agent():
-    tools = [CustomCommandToJSON()]
-
-    agent = initialize_agent(
-        tools, LLM, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
-    )
-    return agent
-
-
 
 class ROSGPTNode(Node):
     def __init__(self):
@@ -134,16 +124,6 @@ class ROSGPTProxy(Resource):
         """
         self.chatgpt_ros2_node = chatgpt_ros2_node
         self.agent = load_agent()
-
-    # def askGPT(self, command) -> str:
-    #     """
-    #     Send a text command to the LangChain agent and return the response.
-    #     Args:
-    #         command (str): The text command to be sent to the GPT-3 model.
-    #     Returns:
-    #         str: The response from the GPT-3 model as a JSON string.
-    #     """
-
 
     def post(self):
         """
