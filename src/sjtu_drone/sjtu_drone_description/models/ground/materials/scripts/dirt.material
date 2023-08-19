@@ -1,0 +1,15 @@
+// grass.material
+material dirt/Black
+{
+   receive_shadows off
+   technique
+   {
+      pass
+      {
+         texture_unit
+         {
+            texture dirt_diffusespecular.png
+         }
+      }
+   }
+}

@@ -181,7 +181,7 @@ class DroneController(Node):
 
         twist_msg.linear.x = 0.0
         twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
+        
 
         print("Stopping the drone ...")
 

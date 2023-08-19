@@ -171,6 +171,9 @@ class ROSGPTProxy(Resource):
         Prompt: "Stop."
         Returns: {"action": "stop", "params": {}}
 
+        Prompt: "Go to garden."
+        Returns: {"action": "move", "params": {"linear_speed": 0.8, "distance": 10, "direction": "forward"}}
+
         You will be given human language prompts, and you need to return a JSON conformant to the ontology. Any action not in the ontology must be ignored.
 
         Examples in other languages:
