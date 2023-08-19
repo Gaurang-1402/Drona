@@ -149,16 +149,6 @@ class ROSGPTProxy(Resource):
         self.chatgpt_ros2_node = chatgpt_ros2_node
         self.agent = load_agent()
 
-    # def askGPT(self, command) -> str:
-    #     """
-    #     Send a text command to the LangChain agent and return the response.
-    #     Args:
-    #         command (str): The text command to be sent to the GPT-3 model.
-    #     Returns:
-    #         str: The response from the GPT-3 model as a JSON string.
-    #     """
-
-
     def post(self):
         """
         Handles an incoming POST request containing a text command. The method sends the text command
