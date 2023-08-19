@@ -52,8 +52,7 @@ class DroneController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/drone/takeoff', 10)
         self.land_publisher = self.create_publisher(Empty, '/drone/land', 10)
 
-        self.velocity_msg = Twist()
-        self.create_timer(2.0, self.publish_velocity)
+        # self.create_timer(2.0, self.publish_velocity)
         
         self.thread_executor = ThreadPoolExecutor(max_workers=1)
 
@@ -85,10 +84,8 @@ class DroneController(Node):
         vel_msg.angular.x = 0.0
         vel_msg.angular.y = 0.0
         vel_msg.angular.z = 0.0
-        self.velocity_msg = vel_msg
-        
-    def publish_velocity(self):
-        self.velocity_publisher.publish(self.velocity_msg)
+        self.velocity_publisher.publish(vel_msg)
+
 
     #this callback represents the ROSGPTParser. It takes a JSON, parses it, and converts it to a ROS 2 command
     def voice_cmd_callback(self, msg):
@@ -221,8 +218,13 @@ class DroneController(Node):
             print('[Exception] An unexpected error occurred:', str(e))
         
 
+        twist_msg.linear.x = 0.0
+        twist_msg.linear.y = 0.0
+        twist_msg.linear.z = 0.0
+
         print("Stopping the drone ...")
-        self.stop()
+
+        self.velocity_publisher.publish(twist_msg)
 
         # print('distance moved: ', self.get_distance(start_pose, self.pose))
         print('The Robot has stopped...')

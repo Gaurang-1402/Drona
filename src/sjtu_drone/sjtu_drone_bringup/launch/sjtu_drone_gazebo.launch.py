@@ -26,7 +26,7 @@ def generate_launch_description():
 
     world_file = os.path.join(
         get_package_share_directory("sjtu_drone_description"),
-        "worlds", "farm3.world"
+        "worlds", "playground.world"
     )
 
     return LaunchDescription([
@@ -53,7 +53,7 @@ def generate_launch_description():
                 os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
             ),
             launch_arguments={
-                # 'world': world_file,
+                'world': world_file,
                               'verbose': "true",
                               'extra_gazebo_args': 'verbose'}.items()
         ),
