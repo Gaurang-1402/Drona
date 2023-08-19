@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field, validator
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from std_msgs.msg import String
+from .ros_agent.tools import CustomCommandToJSON
 
 # Instantiate a Flask application object with the given name
 app = Flask(__name__)
@@ -32,58 +33,6 @@ api = Api(app)
 
 LLM = OpenAI(temperature=0)
 
-@tool("command_to_json")
-def command_to_json(command: str) -> str:
-    """Converts a single command to a JSON object suitable for a ROS agent. The command must be in English.
-
-    Args:
-        command (str): The command to be converted.
-    
-    Returns:
-        str: The JSON object.
-
-    Examples:
-        >>> command_to_json("Move down for 2 meters at a speed of 0.4 meters per second.")
-        '{"action": "move", "params": {"linear_speed": 0.4, "distance": 2, "direction": "down"}}'
-
-        >>> command_to_json("Move left for 3 meters at a speed of 0.6 meters per second.")
-        '{"action": "move", "params": {"linear_speed": 0.6, "distance": 3, "direction": "left"}}'
-
-        >>> command_to_json("Land the drone.")
-        '{"action": "land", "params": {}}'
-
-        >>> command_to_json("Stop.")
-        '{"action": "stop", "params": {}}'
-    """
-    class ActionType(str, Enum):
-        land = "land"
-        takeoff = "takeoff"
-        move = "move"
-        stop = "stop"
-
-    class MoveParams(BaseModel):
-        linear_speed: float
-        distance: float = Field(..., ge=-1, le=1)
-        direction: str = Field(..., regex="forward|backward|left|right|up|down")
-
-    class Action(BaseModel):
-        action: ActionType
-        params: Optional[Union[Dict, MoveParams]]
-
-    # Set up a parser + inject instructions into the prompt template.
-    parser = PydanticOutputParser(pydantic_object=Action)
-
-    # Prompt
-    prompt = PromptTemplate(
-        template="Format the command as a JSON object suitable for a ROS agent.\n{command}\n",
-        input_variables=["command"],
-    )
-
-    # Run
-    _input = prompt.format_prompt(command=command)
-    model = OpenAI(temperature=0)
-    output = model(_input.to_string())
-    return parser.parse(output)
 
 @tool("drone_location")
 def get_drone_location():
@@ -109,8 +58,11 @@ def get_poi_location(point_of_interest: str) -> tuple:
     return poi_map[point_of_interest]
 
 def load_agent():
-    tools = [get_drone_location, get_poi_location, command_to_json]
-    agent = initialize_agent(tools, LLM, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+    tools = [CustomCommandToJSON()]
+
+    agent = initialize_agent(
+        tools, LLM, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
+    )
     return agent
 
 
