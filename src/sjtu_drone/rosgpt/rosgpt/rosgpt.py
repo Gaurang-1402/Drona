@@ -136,6 +136,7 @@ class ROSGPTProxy(Resource):
         {"action": "land", "params": {}}
         {"action": "takeoff", "params": {}}
         {"action": "move", "params": {"linear_speed": linear_speed, "distance": distance, "direction": direction}}
+        {"action": "garden", "params": [{"linear_speed": linear_speed, "distance": distance, "direction": direction}, {"linear_speed": linear_speed, "distance": distance, "direction": direction}, {"linear_speed": linear_speed, "distance": distance, "direction": direction}]}
 
         You may get a command in another language, translate it to English and then create the JSON.
 
@@ -174,7 +175,7 @@ class ROSGPTProxy(Resource):
         Returns: {"action": "stop", "params": {}}
 
         Prompt: "Go to garden."
-        Returns: {"action": "move", "params": {"linear_speed": 0.8, "distance": 5, "direction": "forward"}}
+        Returns: {"action": "garden", "params": [{"linear_speed": 0.8, "distance": 5, "direction": "forward"}, {"linear_speed": 0.8, "distance": 5, "direction": "left"}]}
 
         You will be given human language prompts, and you need to return a JSON conformant to the ontology. Any action not in the ontology must be ignored.
 
@@ -191,6 +192,7 @@ class ROSGPTProxy(Resource):
         Hindi:
         Prompt: "Aage badho 1 meter, 0.5 meters per second ke liye."
         Returns: {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}
+
         '''
 
 
@@ -227,7 +229,6 @@ class ROSGPTProxy(Resource):
         json_response_dict = chatgpt_response[start_index:end_index]
         #print('\n\n\njson_response_dict ',json_response_dict)
         return json.dumps({'text': chatgpt_response, 'json': json_response_dict})
-
 
 
     def post(self):

@@ -86,6 +86,22 @@ class DroneController(Node):
             elif cmd['action'] == 'stop':
                 self.thread_executor.submit(self.stop)
 
+            elif cmd['action'] == 'garden':
+                for direction in cmd['params']:
+                    print(direction)
+                    linear_speed = direction.get('linear_speed', 0.2)
+                    distance = direction.get('distance', 1.0)
+                    direction = direction.get('direction', "forward")
+
+                    print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
+                    
+                    # METHOD: Create a thread executor
+                    # we need to run the method on a different thread to avoid blocking rclpy.spin. 
+                    self.thread_executor.submit(self.move, linear_speed, distance, direction)
+
+                # running move on the main thread will generate to error, as it will block rclpy.spin
+                # self.move(linear_speed, distance, direction)
+
             elif cmd['action'] == 'move':
                 linear_speed = cmd['params'].get('linear_speed', 0.2)
                 distance = cmd['params'].get('distance', 1.0)
@@ -102,12 +118,12 @@ class DroneController(Node):
 
             elif cmd['action'] == 'rotate':
                 print("Rotate functionality TODO")
-                pass
                 # angular_velocity = cmd['params'].get('angular_velocity', 1.0)
                 # angle = cmd['params'].get('angle', 90.0)
                 # is_clockwise = cmd['params'].get('is_clockwise', True)
                 # self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
                 #self.rotate(angular_velocity, angle, is_clockwise)
+
         except json.JSONDecodeError:
             print('[json.JSONDecodeError] Invalid or empty JSON string received:', msg.data)
         except Exception as e:
@@ -134,28 +150,20 @@ class DroneController(Node):
         try: 
             if direction == "forward":
                 linear_vector.x = linear_speed
-                linear_vector.y = 0.0
-                linear_vector.z = 0.0
 
             elif direction == "backward":
                 linear_vector.x = -linear_speed
-                linear_vector.y = 0.0
-                linear_vector.z = 0.0
+
             elif direction == "left":
-                linear_vector.x = 0.0
                 linear_vector.y = linear_speed
-                linear_vector.z = 0.0
+
             elif direction == "right":
-                linear_vector.x = 0.0
                 linear_vector.y = -linear_speed
-                linear_vector.z = 0.0
+
             elif direction == "up":
-                linear_vector.x = 0.0
-                linear_vector.y = 0.0
                 linear_vector.z = linear_speed
+
             elif direction == "down":
-                linear_vector.x = 0.0
-                linear_vector.y = 0.0
                 linear_vector.z = -linear_speed
 
         except Exception as e:
