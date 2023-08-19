@@ -36,6 +36,22 @@ def load_agent():
     Command: {input}
     Thought: {agent_scratchpad}"""
 
+    PARSING_ERROR_PROMPT = """Make sure you output an array where each element is a JSON object. Each JSON object should have the following format:
+
+    ```TypeScript
+
+    command: { // 
+    action: string // The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`.
+    params: { // 
+    linear_speed: number // The linear speed of the drone in meters per second. The default value is 0.1. This value must be between 0 and 1.
+    distance: number // The distance to move in meters. This value must be between -1 and 1. The default value is 0.1.
+    direction: string // The direction to move in. This can be one of `forward`, `backward`, `left`, `right`, `up`, `down`.
+    }
+    }
+    ```
+
+    """
+
     tools = [CustomCommandToJSON()]
 
     agent = initialize_agent(
@@ -48,7 +64,7 @@ def load_agent():
             'suffix':SUFFIX
         },
         verbose=True,
-        handle_parsing_errors=True
+        handle_parsing_errors=PARSING_ERROR_PROMPT
     )
 
     return agent

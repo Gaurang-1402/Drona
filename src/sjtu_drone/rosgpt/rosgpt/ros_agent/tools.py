@@ -10,25 +10,25 @@ from . import LLM
 class MoveParams(BaseModel):
     linear_speed: float = Field(
         ...,
-        description="The linear speed of the drone in meters per second.",
+        description="The linear speed of the drone in meters per second. The default value is 0.1. This value must be between 0 and 1.", 
         ge=0, le=1)
-
+    
     distance: float = Field(
         ...,
-        description="The distance to move in meters.",
+        description="The distance to move in meters. This value must be between -1 and 1. The default value is 0.1.", 
         ge=-1, le=1)
-
+    
     direction: str = Field(
-        ...,
+        ..., 
         description="The direction to move in. This can be one of `forward`, `backward`, `left`, `right`, `up`, `down`.",
         enum=["forward", "backward", "left", "right", "up", "down"])
-
 
 class Command(BaseModel):
     action: str = Field(
         ...,
         description="The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`.",
-        enum=["land", "takeoff", "move", "stop"])
+        enum=["land", "takeoff", "move", "stop"]
+    )
     params: Optional[MoveParams]
 
 
