@@ -4,9 +4,7 @@ from pydantic import BaseModel, Field
 from langchain.tools import BaseTool
 from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
 from langchain.chat_models.openai import ChatOpenAI
-
-
-LLM = ChatOpenAI(temperature=0)
+from . import LLM
 
 
 class MoveParams(BaseModel):
@@ -37,6 +35,15 @@ class Command(BaseModel):
 class ExtractionInput(BaseModel):
     command: str = Field(...)
 
+schema, validator = from_pydantic(
+    Command,
+    examples=[
+        ("Land the drone.", {"action": "land"}),
+        ("Takeoff the drone.", {"action": "takeoff"}),
+        ("Move down for 2 meters at a speed of 0.4 meters per second.",
+            {"action": "move",
+            "params": {"linear_speed": 0.4, "distance": 2, "direction": "down"}})])
+extraction_chain = create_extraction_chain(LLM, schema, encoder_or_encoder_class='json', validator=validator)
 
 class CustomCommandToJSON(BaseTool):
     name = "command_to_json"
@@ -45,24 +52,13 @@ class CustomCommandToJSON(BaseTool):
                    "The command must be in English.")
     args_schema: Type[BaseModel] = ExtractionInput
 
-    def __init__(self):
-        schema, validator = from_pydantic(
-            Command,
-            examples=[
-                ("Land the drone.", {"action": "land"}),
-                ("Takeoff the drone.", {"action": "takeoff"}),
-                ("Move down for 2 meters at a speed of 0.4 meters per second.",
-                 {"action": "move",
-                  "params": {"linear_speed": 0.4, "distance": 2, "direction": "down"}})])
-        self.extraction_chain = create_extraction_chain(LLM, schema, encoder_or_encoder_class='json', validator=validator)
-
     def _run(
         self,
         command: str,
         run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        return self.extraction_chain.run(command)
+        return extraction_chain.run(command)
 
     async def _arun(
         self,
