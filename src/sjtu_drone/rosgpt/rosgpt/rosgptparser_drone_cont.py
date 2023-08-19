@@ -52,12 +52,18 @@ class DroneController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/drone/takeoff', 10)
         self.land_publisher = self.create_publisher(Empty, '/drone/land', 10)
 
+        self.velocity_msg = Twist()
+        self.create_timer(2.0, self.publish_velocity)
+        
         self.thread_executor = ThreadPoolExecutor(max_workers=1)
 
         self.move_executor = SingleThreadedExecutor()
         move_thread = threading.Thread(target=self.move_executor.spin)
         move_thread.start()
         print('ROSGPT Drone Controller Started. Waiting for input commands ...')
+
+    def publish_velocity(self):
+        self.velocity_publisher.publish(self.velocity_msg)
     
     def pose_callback(self, msg):
         self.x = msg.position.x
@@ -82,7 +88,7 @@ class DroneController(Node):
         vel_msg.angular.x = 0.0
         vel_msg.angular.y = 0.0
         vel_msg.angular.z = 0.0
-        self.velocity_publisher.publish(vel_msg)
+        self.velocity_msg = vel_msg
 
 
     #this callback represents the ROSGPTParser. It takes a JSON, parses it, and converts it to a ROS 2 command
@@ -120,7 +126,7 @@ class DroneController(Node):
             elif cmd['action'] == 'rotate':
                 angular_velocity = cmd['params'].get('angular_velocity', 1.0)
                 angle = cmd['params'].get('angle', 90.0)
-                is_clockwise = cmd['params'].get('is_clockwise', True)
+                is_clockwise = bool(cmd['params'].get('is_clockwise', True))
                 self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
                 # self.rotate(angular_velocity, angle, is_clockwise)
 
@@ -192,7 +198,7 @@ class DroneController(Node):
 
                 print('distance moved: ', self.get_distance(start_pose, self.pose))
 
-                self.velocity_publisher.publish(twist_msg)
+                self.velocity_msg = twist_msg
                 self.move_executor.spin_once(timeout_sec=0.5)
         except Exception as e:
 
@@ -219,8 +225,12 @@ class DroneController(Node):
             print('[ERROR]: The rotation speed must be lower than 0.5!')
             return -1
         
-        angular_speed_radians = math.radians(angular_speed_degree)
-        twist_msg.angular.z = -abs(angular_speed_radians) if clockwise else abs(angular_speed_radians)
+        angular_speed_radians = abs(math.radians(angular_speed_degree))
+        if clockwise:
+            twist_msg.angular.z = -1 * angular_speed_radians
+        else:
+            twist_msg.angular.z = angular_speed_radians
+        
         # twist_msg.angular.z = abs(angular_speed_radians) * (-1 if clockwise else 1)
 
         start_pose = copy.copy(self.pose)
@@ -230,7 +240,7 @@ class DroneController(Node):
         rotated_related_angle_degree=0.0
 
         while rotated_related_angle_degree<desired_relative_angle_degree:
-            self.velocity_publisher.publish(twist_msg)
+            self.velocity_msg = twist_msg
             start_theta = quat2Yaw(start_pose.orientation.w, start_pose.orientation.x, start_pose.orientation.y, start_pose.orientation.z)
             pose_theta = quat2Yaw(self.pose.orientation.w, self.pose.orientation.x, self.pose.orientation.y, self.pose.orientation.z)
             rotated_related_angle_degree = math.degrees(abs(start_theta - pose_theta))

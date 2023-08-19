@@ -56,8 +56,8 @@
           </geometry>
           <material>
             <script>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/src/sjtu_drone/sjtu_drone_description/models/ground/materials/scripts</uri>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/src/sjtu_drone/sjtu_drone_description/models/ground/materials/textures</uri>
+              <uri>model://ground/materials/scripts</uri>
+              <uri>model://ground/materials/textures</uri>
               <name>grassColor/Green</name>
             </script>
             <ambient>1 1 1 1</ambient>
@@ -108,8 +108,8 @@
           </geometry>
           <material>
             <script>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/src/sjtu_drone/sjtu_drone_description/models/ground/materials/scripts</uri>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/src/sjtu_drone/sjtu_drone_description/models/ground/materials/textures</uri>
+              <uri>model://ground/materials/scripts</uri>
+              <uri>model://ground/materials/textures</uri>
               <name>dirt/Black</name>
             </script>
             <ambient>1 1 1 1</ambient>
@@ -508,7 +508,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/quadrotor_4.stl</uri>
+              <uri>model://sjtu_drone/quadrotor_4.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -530,7 +530,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>file:///home/chief-of-mischief/Desktop/drone_ws/install/sjtu_drone_description/share/sjtu_drone_description/models/sjtu_drone/quadrotor_4.dae</uri>
+              <uri>model://sjtu_drone/quadrotor_4.dae</uri>
             </mesh>
           </geometry>
         </visual>

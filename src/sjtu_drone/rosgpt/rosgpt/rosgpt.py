@@ -162,6 +162,12 @@ class ROSGPTProxy(Resource):
         Prompt: "Move down for 2 meters at a speed of 0.4 meters per second."
         Returns: {"action": "move", "params": {"linear_speed": 0.4, "distance": 2, "direction": "down"}}
 
+        Prompt: "Rotate clockwise for 30 degrees at a speed of 1 degree per second."
+        Returns: {"action": "rotate", "params": {"angular_speed": 1, "angle": 30, "is_clockwise": 1}}
+
+        Prompt: "Rotate anticlockwise for 20 degrees at a speed of 0.5 degree per second."
+        Returns: {"action": "rotate", "params": {"angular_speed": 0.5, "angle": 20, "is_clockwise": 0}}
+
         Prompt: "Take off."
         Returns: {"action": "takeoff", "params": {}}
 
