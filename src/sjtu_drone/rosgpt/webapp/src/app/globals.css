@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  color: white;
+  background: #000000;
+  font-family: 'Red Hat Display', sans-serif !important;
+}
+
+
+.drona-sidebar {
+  background: #222224;
+
+}
+
+
+.drona-card{
+  background: #222224;
+}
