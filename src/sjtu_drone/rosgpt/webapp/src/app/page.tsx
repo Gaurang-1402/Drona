@@ -1,11 +1,11 @@
 'use client'
 
 import Compass from './Compass'
+import GaugeChart from 'react-gauge-chart'
 import { TrendingQuestions } from './TrendingQuestions'
 import TimeComponent from './TimeComponent'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
-import { useEffect, useRef } from 'react';
 import ROSLIB from 'roslib';
 
 export default function Home() {
@@ -169,9 +169,10 @@ export default function Home() {
       <div className='drona-sidebar flex flex-col h-screen px-4 py-10'>
 
 
-        <div className='mb-10 font-bold text-lg'>
-          Drona
-        </div>
+      <div className='mb-10 font-bold text-lg flex flex-col items-center'>
+        <img src="/drona_logo_small.png" alt="Drona Logo" className="w-12 h-12" />
+        <span>Drona</span>
+      </div>
 
         <div className='flex flex-col h-full gap-3'>
 
@@ -225,10 +226,10 @@ export default function Home() {
           <div className='drona-card px-7 py-5 text-sm h-fit rounded-xl'>
             <div className='flex justify-between'>
               <div>
-                <div className='font-bold'>
+                <div className='font-bold text-lg'>
                   Drona Model Z
                 </div>
-                <div className='text-gray-500'>
+                <div className='text-gray-500 text-sm' >
                   AI powered FHD drone with 4K camera
                 </div>
               </div>
@@ -241,7 +242,7 @@ export default function Home() {
 
 
             <div className='flex justify-between'>
-              <div className='text-pink-400 text-base font-bold'>
+              <div className='text-pink-400 text-base text-sm font-bold'>
                 <TimeComponent />
               </div>
 
@@ -278,16 +279,28 @@ export default function Home() {
                 <input required value={currentPrompt} onChange={(e) => setPrompt(e.target.value)} className='w-full rounded px-3 py-3 text-md text-[#222224]' placeholder='instruct your drone to do something cool. 😎' />
               </form>
 
-              <img className='w-14' src="https://img.icons8.com/ios-filled/100/ffffff/microphone--v1.png" alt="microphone--v1" />
+              <img className='w-12 ml-2' src="/mic_icon.png" alt="microphone--v1" />
             </div>
 
             <TrendingQuestions setPrompt={setPrompt} />
 
           </div>
 
-          <div className='drona-card col-span-1 px-7 py-5 rounded-xl'>
-            <Compass />
+          <div className='drona-card col-span-1 px-7 py-5 rounded-xl flex flex-col justify-center items-center'>
+            <div className='w-4/5 h-4/5 mb-4'>
+              <Compass />
+            </div>
+            <GaugeChart
+              id="gauge-chart5"
+              nrOfLevels={420}
+              arcsLength={[0.3, 0.5, 0.2]}
+              colors={['#5BE12C', '#F5CD19', '#EA4228']}
+              percent={0.37}
+              arcPadding={0.02}
+            />
+            <span> Speed </span>
           </div>
+
 
 
 

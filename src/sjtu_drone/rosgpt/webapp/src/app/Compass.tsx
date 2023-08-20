@@ -28,7 +28,7 @@ const Compass = () => {
 
   return (
     <div>
-      <img src='/compass.png' className='w-full' style={compassStyle} />
+      <img src='/compass.png' alt='compass' className='w-full' style={compassStyle} />
     </div>
   );
 };
