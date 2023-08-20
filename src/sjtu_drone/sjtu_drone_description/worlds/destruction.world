@@ -1829,6 +1829,17 @@
         </visual>
         <enable_wind>0</enable_wind>
       </link>
+      <plugin name="actor_01_odometry_spine" filename="libgazebo_ros_p3d.so">
+        <namespace>actor</namespace>
+        <alwaysOn>true</alwaysOn>
+        <updateRate>100.0</updateRate>
+        <body_name>actor_pose</body_name>
+        <topicName>actor_01_odometry_spine</topicName>
+        <gaussianNoise>0.01</gaussianNoise>
+        <frameName>map</frameName>
+        <xyzOffsets>0 0 0</xyzOffsets>
+        <rpyOffsets>0 0 0</rpyOffsets>
+      </plugin>
     </actor>
     <model name='ground_plane'>
       <static>1</static>
