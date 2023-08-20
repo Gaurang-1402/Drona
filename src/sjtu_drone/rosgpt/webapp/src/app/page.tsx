@@ -21,7 +21,9 @@ export default function Home() {
   const [latestMessageFront, setLatestMessageFront] = useState<any>(null);
   const [latestMessageBottom, setLatestMessageBottom] = useState<any>(null);
 
+  const UNSPLASH_IMG='https://unsplash.com/photos/OXbYiuWe7RY/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8NHx8ZHJvbmUlMjBpbWFnZXxlbnwwfHx8fDE2OTI1NTkxNjV8MA&force=true&w=400'
 
+  console.log(imgSrcFront, imgSrcBottom)
   useEffect(() => {
     const ros = new ROSLIB.Ros({
       url: 'ws://localhost:9090' // replace localhost with your ROS2 machine IP if different
@@ -167,7 +169,7 @@ export default function Home() {
   }
   return (
     <main className='flex gap-6 min-h-screen'>
-      <div className='drona-sidebar flex flex-col h-screen px-4 py-10'>
+      <div className='drona-sidebar fixed w-24 flex flex-col h-screen px-4 py-10'>
 
 
       <div className='mb-10 font-bold text-lg flex flex-col items-center'>
@@ -212,16 +214,16 @@ export default function Home() {
       </div>
 
 
-      <div className="flex flex-col">
+      <div className="flex ml-24 flex-col">
         <div className='my-10 grid h-fit grid-cols-4 gap-4 mx-5'>
-          <div className='col-span-3 flex gap-3 flex-col'>
+          <div className='col-span-3 grid grid-cols-2 gap-3'>
             <div className='drona-card overflow-hidden rounded-xl'>
               <canvas ref={canvasRef1} width={latestMessageFront?.width} height={latestMessageFront?.height} style={{ display: 'none' }}></canvas>
-              {imgSrcFront && <img src={imgSrcFront} className='object-fill' alt="Drone Front Camera Feed" />}
+              <img src={imgSrcFront??UNSPLASH_IMG} className='w-full max-h-[500px] object-fill' alt="Drone Front Camera Feed" />
             </div>
             <div className='drona-card overflow-hidden rounded-xl'>
               <canvas ref={canvasRef2} width={latestMessageBottom?.width} height={latestMessageBottom?.height} style={{ display: 'none' }}></canvas>
-              {imgSrcBottom && <img src={imgSrcBottom} alt="Drone Front Camera Feed" />}
+              <img src={imgSrcBottom??UNSPLASH_IMG} className='w-full max-h-[500px] object-fill' alt="Drone Front Camera Feed" />
             </div>
           </div>
 
