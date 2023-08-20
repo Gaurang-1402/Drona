@@ -21,6 +21,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from std_msgs.msg import Empty
+from nav_msgs.msg import Odometry
 
 def quat2Yaw(qw, qx, qy, qz):
     '''
@@ -47,10 +48,12 @@ class DroneController(Node):
         self.create_subscription(String,'/voice_cmd',self.voice_cmd_callback,10)
         self.velocity_publisher = self.create_publisher(Twist, '/drone/cmd_vel', 10)
         self.pose_subscriber = self.create_subscription(Pose, "/drone/gt_pose", self.pose_callback, 10)
+        self.actorpose_subscriber = self.create_subscription(Odometry, "/actor/odom", self.actorpose_callback, 10)
         self.x = 0.0
         self.y  = 0.0
         self.theta  = 0.0
         self.pose = Pose()
+        self.actorpose = Pose()
         
         self.takeoff_publisher = self.create_publisher(Empty, '/drone/takeoff', 10)
         self.land_publisher = self.create_publisher(Empty, '/drone/land', 10)
@@ -76,6 +79,11 @@ class DroneController(Node):
         self.z = msg.position.z
         self.theta = msg.orientation
         self.pose = msg
+
+    def actorpose_callback(self, msg):
+        self.actorpose.position.x = msg.pose.pose.position.x
+        self.actorpose.position.y = msg.pose.pose.position.y
+        self.actorpose.position.z = msg.pose.pose.position.z
 
     def hover(self):
         if self.hovering == 0:
@@ -106,7 +114,7 @@ class DroneController(Node):
         time.sleep(3)
         self.hovering = 0
 
-    def stop(self):
+    def stop(self): 
         vel_msg = Twist()
         vel_msg.linear.x = 0.0
         vel_msg.linear.y = 0.0
@@ -115,6 +123,7 @@ class DroneController(Node):
         vel_msg.angular.y = 0.0
         vel_msg.angular.z = 0.0
         self.velocity_publisher.publish(vel_msg)
+        self.hovering = 1
 
 
     #this callback represents the ROSGPTParser. It takes a JSON, parses it, and converts it to a ROS 2 command
@@ -140,6 +149,12 @@ class DroneController(Node):
                     
                 elif cmd["action"] == 'stop':
                     self.thread_executor.submit(self.stop)
+
+                elif cmd["action"] == 'follow':
+                    self.thread_executor.submit(self.follow)
+
+                elif cmd["action"] == 'unfollow':
+                    self.hovering = 1
 
                 elif cmd["action"] == 'move':
                     linear_speed = cmd["params"].get('linear_speed', 0.2)
@@ -293,6 +308,33 @@ class DroneController(Node):
         print('The Robot has stopped...')
 
         return 0
+
+
+    def follow(self):
+        self.stop()
+        self.hovering = 0
+
+        print('Following')
+        
+        start_pose = copy.copy(self.pose)
+        while self.hovering == 0:
+            ax = self.actorpose.position.x
+            ay = self.actorpose.position.y
+
+            dx = self.pose.position.x
+            dy = self.pose.position.y
+
+
+            vel_msg = Twist()
+            vel_msg.linear.x = 0.15 * (ax - dx)
+            vel_msg.linear.y = 0.15 * (ay - dy)
+            vel_msg.linear.z = 0.15 * (start_pose.position.z - self.pose.position.z)
+            self.velocity_publisher.publish(vel_msg)
+
+
+        print('Unfollowing')
+        self.stop()
+        self.hovering = 1     
 
     
 def main(args=None):
