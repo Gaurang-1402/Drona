@@ -1,7 +1,7 @@
 from langchain.chat_models.openai import ChatOpenAI
 from langchain.agents import AgentType, initialize_agent, load_tools
 from langchain.tools import StructuredTool
-from .tools import CustomCommandToJSON, RetrievePOICoordinates, ComputeDroneMovements
+from .tools import CustomCommandToJSON, RetrievePOICoordinates, ComputeDroneMovements, PhraseClarifyingQuestion
 from . import LLM
 
 
@@ -68,9 +68,17 @@ def load_agent():
     """
 
     tools = load_tools(['human'], llm=LLM)
+    # TODO: if the response is non conclusive?
+    # if chatgpt_response and chatgpt_response.need_more_info:
+    #     # if you send this thing, next time the client will send an array of [text_command]
+    #     return {
+    #         'require_more_info': True,
+    #         'help_text': chatgpt_response.help_text
+    #     }
     tools.append(CustomCommandToJSON())
     tools.append(RetrievePOICoordinates())
     tools.append(ComputeDroneMovements())
+    tools.append(PhraseClarifyingQuestion())
 
     agent = initialize_agent(
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,

@@ -40,7 +40,7 @@ from .ros_agent.agent import load_agent
 app = Flask(__name__)
 
 # Enable Cross-Origin Resource Sharing (CORS) for the Flask app
-CORS(app)
+CORS(app, origins=['*'])
 
 # Create an API object that wraps the Flask app to handle RESTful requests
 api = Api(app)
@@ -159,15 +159,29 @@ class ROSGPTProxy(Resource):
         """
 
         text_command = request.form['text_command']
+
+        if text_command.startswith('[') and text_command.endswith(']'):
+            text_command = json.loads(text_command)
+        else:
+            text_command = [text_command]
+        
+        print(text_command)
         chatgpt_response = self.agent.run(text_command)
-        print(chatgpt_response)
 
-        if chatgpt_response is None:
+        if not chatgpt_response:
             return {'error': 'An error occurred while processing the request'}
-
-        threading.Thread(target=process_and_publish_chatgpt_response, args=(self.chatgpt_ros2_node, text_command, chatgpt_response, True)).start()
-
-        return json.loads(chatgpt_response)
+        elif chatgpt_response == "Agent stopped due to iteration limit or time limit." or chatgpt_response == "[]":
+            return {'error': 'An error occurred while processing the request'}
+        elif chatgpt_response[0] != '[':
+            return {
+                'require_more_info': True,
+                'help_text': chatgpt_response
+            }
+        else:
+            threading.Thread(
+                target=process_and_publish_chatgpt_response, 
+                args=(self.chatgpt_ros2_node, text_command, chatgpt_response, True)).start()
+            return json.loads(chatgpt_response)
 
 @app.route('/')
 def index():

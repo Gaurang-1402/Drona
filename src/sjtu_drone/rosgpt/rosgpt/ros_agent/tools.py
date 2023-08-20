@@ -90,9 +90,10 @@ class RetrievePOICoordinates(BaseTool):
             'kitchen': (60, 20, 1)
         }
         try:
-            return poi_coordinates[location]
+            coords = poi_coordinates[location]
+            return coords
         except KeyError:
-            raise KeyError(f"Invalid location: {location}. Please try another tool.")
+            return(f"Invalid location: {location}. Please try another tool.")
                      
     async def _arun(
         self,
@@ -121,6 +122,25 @@ class GetDroneLocation(BaseTool):
     ) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("Get Drone Location does not support async")
+
+class QuestionInput(BaseModel):
+    question: str = Field(..., description="The question to ask.")
+
+
+class PhraseClarifyingQuestion(BaseTool):
+    name = "phrase_clarifying_question"
+    description = ("useful when you need to ask a clarifying question about a phrase in the command.")
+    args_schema: Type[BaseModel] = QuestionInput
+    return_direct = True
+
+    def _run(
+        self,
+        question: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return question
+
 
 # TODO: Implement this tool  
 # class GetDroneOrientation(BaseTool):
