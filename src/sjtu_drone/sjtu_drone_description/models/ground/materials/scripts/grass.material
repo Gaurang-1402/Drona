@@ -1,0 +1,15 @@
+// grass.material
+material grassColor/Green
+{
+   receive_shadows off
+   technique
+   {
+      pass
+      {
+         texture_unit
+         {
+            texture grass_color.jpg
+         }
+      }
+   }
+}

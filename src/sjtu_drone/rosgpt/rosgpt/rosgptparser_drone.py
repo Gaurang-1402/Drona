@@ -5,9 +5,13 @@ import json
 import copy
 import math
 import rclpy 
+from math import atan2
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Vector3
+import logging
 
+# Configure the logger
+logging.basicConfig(level=logging.ERROR)
 
 # Now, twist_msg.linear.x is x, twist_msg.linear.y is y, twist_msg.linear.z is z
 from geometry_msgs.msg import Pose
@@ -18,7 +22,23 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from std_msgs.msg import Empty
 
+def quat2Yaw(qw, qx, qy, qz):
+    '''
+    Translates from Quaternion to Yaw. 
 
+    @param qw,qx,qy,qz: Quaternion values
+
+    @type qw,qx,qy,qz: float
+
+    @return Yaw value translated from Quaternion
+
+    '''
+    rotateZa0=2.0*(qx*qy + qw*qz)
+    rotateZa1=qw*qw + qx*qx - qy*qy - qz*qz
+    rotateZ=0.0
+    if(rotateZa0 != 0.0 and rotateZa1 != 0.0):
+        rotateZ=atan2(rotateZa0,rotateZa1)
+    return rotateZ
 
 class DroneController(Node):
 
@@ -35,6 +55,8 @@ class DroneController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/drone/takeoff', 10)
         self.land_publisher = self.create_publisher(Empty, '/drone/land', 10)
 
+        # self.create_timer(2.0, self.publish_velocity)
+        
         self.thread_executor = ThreadPoolExecutor(max_workers=1)
 
         self.move_executor = SingleThreadedExecutor()
@@ -72,46 +94,52 @@ class DroneController(Node):
     def voice_cmd_callback(self, msg):
         #print(msg.data)
         try:
-            cmd = json.loads(msg.data)
-            cmd = json.loads(cmd['json']) #we only consider the pure json message. cmd['text'] contains a mix of text and json
-            print('JSON command received: \n',cmd,'\n')
 
-            if cmd['action'] == 'takeoff':
-                print("Takeoff functionality")
-                self.thread_executor.submit(self.takeoff)
+            print(msg.data)
 
-            elif cmd['action'] == 'land':
-                self.thread_executor.submit(self.land)
+            commands = json.loads(msg.data.strip("'").replace("'", '"'))
+
+            print(commands)
+            
+            for cmd in commands:
+                cmd = cmd['command']
                 
-            elif cmd['action'] == 'stop':
-                self.thread_executor.submit(self.stop)
+                if cmd["action"] == 'takeoff':
+                    print("Takeoff functionality")
+                    self.thread_executor.submit(self.takeoff)
 
-            elif cmd['action'] == 'move':
-                linear_speed = cmd['params'].get('linear_speed', 0.2)
-                distance = cmd['params'].get('distance', 1.0)
-                direction = cmd['params'].get('direction', "forward")
+                elif cmd["action"] == 'land':
+                    self.thread_executor.submit(self.land)
+                    
+                elif cmd["action"] == 'stop':
+                    self.thread_executor.submit(self.stop)
 
-                print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
-                
-                # METHOD: Create a thread executor
-                # we need to run the method on a different thread to avoid blocking rclpy.spin. 
-                self.thread_executor.submit(self.move, linear_speed, distance, direction)
+                elif cmd["action"] == 'move':
+                    linear_speed = cmd["params"].get('linear_speed', 0.2)
+                    distance = cmd["params"].get('distance', 1.0)
+                    direction = cmd["params"].get('direction', "forward")
 
-                # running move on the main thread will generate to error, as it will block rclpy.spin
-                # self.move(linear_speed, distance, direction)
+                    print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
+                    
+                    # METHOD: Create a thread executor
+                    # we need to run the method on a different thread to avoid blocking rclpy.spin. 
+                    self.thread_executor.submit(self.move, linear_speed, distance, direction)
 
-            elif cmd['action'] == 'rotate':
-                print("Rotate functionality TODO")
-                pass
-                # angular_velocity = cmd['params'].get('angular_velocity', 1.0)
-                # angle = cmd['params'].get('angle', 90.0)
-                # is_clockwise = cmd['params'].get('is_clockwise', True)
-                # self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
-                #self.rotate(angular_velocity, angle, is_clockwise)
-        except json.JSONDecodeError:
-            print('[json.JSONDecodeError] Invalid or empty JSON string received:', msg.data)
+                    # running move on the main thread will generate to error, as it will block rclpy.spin
+                    # self.move(linear_speed, distance, direction)
+
+                ## TODO: langchain sync up
+                # elif cmd['command'] == 'rotate':
+                #     angular_velocity = cmd.get('angular_velocity', 1.0)
+                #     angle = cmd.get('angle', 90.0)
+                #     is_clockwise = bool(cmd.get('is_clockwise', True))
+                #     self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
+                    # self.rotate(angular_velocity, angle, is_clockwise)
+
+        except json.JSONDecodeError as e:
+            logging.exception('[json.JSONDecodeError] Invalid or empty JSON string received: %s', msg.data)
         except Exception as e:
-            print('[Exception] An unexpected error occurred:', str(e))   
+            logging.exception('[Exception] An unexpected error occurred: %s', str(e)) 
 
 
     def get_distance(self, start, destination):
@@ -120,6 +148,7 @@ class DroneController(Node):
             ((destination.position.y - start.position.y) ** 2) +
             ((destination.position.z - start.position.z) ** 2)
         )
+
 
     def move(self, linear_speed, distance, direction): 
         print(f'Start moving the drone {direction} at {linear_speed} m/s for a distance of {distance} meters')
@@ -191,43 +220,44 @@ class DroneController(Node):
         print('The Robot has stopped...')
 
 
+    def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
+        print('Start Rotating the Robot ...')
+        #rclpy.spin_once(self)
 
+        print("Stopping the drone ...")
+        self.stop()
 
-    # def rotate (self, angular_speed_degree, desired_relative_angle_degree, clockwise):
-    #     print('Start Rotating the Robot ...')
-    #     #rclpy.spin_once(self)
-    #     twist_msg=Twist()
-    #     angular_speed_degree=abs(angular_speed_degree) #make sure it is a positive relative angle
-    #     if (angular_speed_degree>30) :
-    #         print (angular_speed_degree)
-    #         print('[ERROR]: The rotation speed must be lower than 0.5!')
-    #         return -1
+        twist_msg=Twist()
+        angular_speed_degree=abs(angular_speed_degree) #make sure it is a positive relative angle
+        if (angular_speed_degree>30) :
+            print (angular_speed_degree)
+            print('[ERROR]: The rotation speed must be lower than 0.5!')
+            return -1
         
-    #     angular_speed_radians = math.radians(angular_speed_degree)
-    #     twist_msg.angular.z = -abs(angular_speed_radians) if clockwise else abs(angular_speed_radians)
-    #     twist_msg.angular.z = abs(angular_speed_radians) * (-1 if clockwise else 1)
+        angular_speed_radians = math.radians(angular_speed_degree)
+        twist_msg.angular.z = -abs(angular_speed_radians) if clockwise else abs(angular_speed_radians)
+        # twist_msg.angular.z = abs(angular_speed_radians) * (-1 if clockwise else 1)
 
-    #     start_pose = copy.copy(self.pose)
+        start_pose = copy.copy(self.pose)
         
-    #     #rclpy.spin_once(self)
+        #rclpy.spin_once(self)
 
-    #     rotated_related_angle_degree=0.0
+        rotated_related_angle_degree=0.0
 
-    #     while rotated_related_angle_degree<desired_relative_angle_degree:
-    #         #rclpy.spin_once(self)
-    #         self.velocity_publisher.publish(twist_msg)
-    #         #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
-    #         rotated_related_angle_degree = math.degrees(abs(start_pose.theta - self.pose.theta))
-    #         #rclpy.spin_once(self)
-            
-    #         #rclpy.spin_once(self)
-    #         time.sleep(0.01)
-    #     #print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
-    #     twist_msg.angular.z = 0.0
-    #     self.velocity_publisher.publish(twist_msg)
-    #     print('The Robot has stopped...')
+        while rotated_related_angle_degree<desired_relative_angle_degree:
+            self.velocity_publisher.publish(twist_msg)
+            start_theta = quat2Yaw(start_pose.orientation.w, start_pose.orientation.x, start_pose.orientation.y, start_pose.orientation.z)
+            pose_theta = quat2Yaw(self.pose.orientation.w, self.pose.orientation.x, self.pose.orientation.y, self.pose.orientation.z)
+            rotated_related_angle_degree = math.degrees(abs(start_theta - pose_theta))
+            print('angle rotated: ', rotated_related_angle_degree)
+            time.sleep(0.01)
 
-        #return 0
+        print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
+
+        self.stop()
+        print('The Robot has stopped...')
+
+        return 0
 
     
 def main(args=None):

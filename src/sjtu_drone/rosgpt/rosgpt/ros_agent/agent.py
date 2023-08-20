@@ -12,9 +12,7 @@ def load_agent():
 
     First, you must think about what the command means, and plan out the exact steps you will take to execute the command.
     Even if the command is a single step, you should still plan out the steps you will take to execute the command.
-
-    After you have planned out the steps, you must format each step into a JSON object that the drone can understand. You should
-    use the command_to_json tool to help you. Note: you may only pass a single command to the tool at a time. 
+    After you have planned out the steps, you must format each step into a JSON object that the drone can understand. You should use the command_to_json tool to help you. Note: you may only pass a single command to the tool at a time. 
 
     Once you have finished formatting all the commands, you should return an array containing all the JSON
     formatted commands. The drone will then execute the commands in sequential order. The output should follow this format:
@@ -63,7 +61,10 @@ def load_agent():
     direction: string // The direction to move in. This can be one of `forward`, `backward`, `left`, `right`, `up`, `down`.
     }
     }
+
     ```
+    
+    If you're returning a message, just return the string.
     """
 
     tools = load_tools(['human'], llm=LLM)

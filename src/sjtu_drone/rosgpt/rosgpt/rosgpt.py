@@ -5,6 +5,13 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional, Union
 
+import json
+import openai
+import rclpy
+import threading
+from rclpy.node import Node
+from std_msgs.msg import String
+from rclpy.executors import SingleThreadedExecutor
 import rclpy
 from ament_index_python import get_package_share_directory
 from flask import Flask, request, send_from_directory
@@ -20,6 +27,13 @@ from pydantic import BaseModel, Field, validator
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from std_msgs.msg import String
+from rclpy.executors import SingleThreadedExecutor
+import subprocess
+
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from .ros_agent.agent import load_agent
 
 # Instantiate a Flask application object with the given name
@@ -31,31 +45,18 @@ CORS(app)
 # Create an API object that wraps the Flask app to handle RESTful requests
 api = Api(app)
 
-LLM = OpenAI(temperature=0)
+
+# Now you can use the openai_api_key variable to authenticate with the OpenAI API
 
 
-@tool("drone_location")
-def get_drone_location():
-    """Gets the current drone location.
+# Initialize a threading lock for synchronizing access to shared resources
+# when multiple threads are involved
+spin_lock = threading.Lock()
 
-    Returns:
-        tuple: The current drone location in the form (x, y, z).
-    """
-    return ROSGPTNode.get_loc()
 
-@tool("poi_location")
-def get_poi_location(point_of_interest: str) -> tuple:
-    """Gets the current point of interest location.
+# Create a separate threading lock for synchronizing access to the TTS engine
+tts_lock = threading.Lock()
 
-    Returns:
-        tuple: The current point of interest location in the form (x, y, z).
-    """
-    poi_map = {
-        'garden': (0, 0, 0),
-        'greenhouse': (1, 1, 1),
-        'kitchen': (2, 2, 2)
-        }
-    return poi_map[point_of_interest]
 
 class ROSGPTNode(Node):
     def __init__(self):
@@ -68,7 +69,7 @@ class ROSGPTNode(Node):
         # Subscribe to the 'position_data' topic
         self.subscription = self.create_subscription(
             Pose, 
-            'position_data', 
+            '/drone/gt_pose', 
             self.position_callback, 
             10)
         
@@ -97,7 +98,7 @@ class ROSGPTNode(Node):
         msg : PointStamped
             The received message containing position data.
         """
-        self.position = (msg.point.x, msg.point.y, msg.point.z)
+        self.position = (msg.position.x, msg.position.y, msg.position.z)
 
     def get_loc(self):
         """
@@ -109,6 +110,29 @@ class ROSGPTNode(Node):
             The latest position data in the form (x, y, z), or None if no position data has been received.
         """
         return self.position
+    
+def process_and_publish_chatgpt_response(chatgpt_ros2_node, text_command, chatgpt_response, use_executors=True):
+    """
+    Process the chatbot's response and publish it to the 'voice_cmd' topic.
+
+    Args:
+        chatgpt_ros2_node (ROSGPTNode): The ROS2 node instance.
+        text_command (str): The text command received from the user.
+        chatgpt_response (str): The response from the chatbot.
+        use_executors (bool, optional): Flag to indicate whether to use SingleThreadedExecutor. Defaults to True.
+    """
+    chatgpt_ros2_node.publish_message(chatgpt_response) # Publish the chatbot's response using the ROS2 node
+    # If use_executors flag is True, use SingleThreadedExecutor
+    if use_executors:
+        executor = SingleThreadedExecutor()# Create a new executor for each request 
+        executor.add_node(chatgpt_ros2_node) # Add the node to the executor
+        executor.spin_once()#  Spin the executor once
+        executor.remove_node(chatgpt_ros2_node) # Remove the node from the executor
+    # If use_executors flag is False, use spin_lock to synchronize access
+    else:
+        with spin_lock:
+            rclpy.spin_once(chatgpt_ros2_node)
+
     
 class ROSGPTProxy(Resource):
     """
@@ -141,7 +165,9 @@ class ROSGPTProxy(Resource):
         if chatgpt_response is None:
             return {'error': 'An error occurred while processing the request'}
 
-        return chatgpt_response
+        threading.Thread(target=process_and_publish_chatgpt_response, args=(self.chatgpt_ros2_node, text_command, chatgpt_response, True)).start()
+
+        return json.loads(chatgpt_response)
 
 @app.route('/')
 def index():

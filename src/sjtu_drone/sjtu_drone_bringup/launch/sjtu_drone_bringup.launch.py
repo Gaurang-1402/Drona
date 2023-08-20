@@ -19,17 +19,8 @@ def generate_launch_description():
         sjtu_drone_bringup_path, "rviz", "rviz.rviz"
     )
 
-    return LaunchDescription([
-        Node(
-            package="rviz2",
-            executable="rviz2",
-            name="rviz2",
-            arguments=[
-                "-d", rviz_path
-            ],
-            output="screen",
-        ),
 
+    return LaunchDescription([
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(sjtu_drone_bringup_path, 'launch', 'sjtu_drone_gazebo.launch.py')
