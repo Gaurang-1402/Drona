@@ -30,9 +30,12 @@ export default function Home() {
         }),
       });
 
-
       let jsonResponse = await response.json();
       console.log("Received response from robot:", jsonResponse);
+
+      if(response.status !== 200){
+        throw new Error(jsonResponse.message??'Something went wrong.')
+      }
 
       if(jsonResponse.error){
         toast.error(jsonResponse.error)
