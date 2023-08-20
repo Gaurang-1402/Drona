@@ -16,68 +16,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Pose
 import traceback
 import copy
-
-class ROSGPTLocationNode(Node):
-    def __init__(self):
-        """
-        Initialize the ROSGPTNode class which is derived from the rclpy Node class.
-        """
-        super().__init__('chatgpt_ros2_node')
-        
-        # Subscribe to the 'position_data' topic
-        self.subscription = self.create_subscription(
-            Pose, 
-            '/drone/gt_pose', 
-            self.position_callback, 
-            10)
-        
-        self.subscription
-        self.position = None  # Initialize the position attribute to None
-
-
-    def position_callback(self, msg):
-        """
-        Callback function that gets executed whenever a new position message is received.
-
-        Parameters
-        ----------
-        msg : PointStamped
-            The received message containing position data.
-        """
-        self.position = (msg.position.x, msg.position.y, msg.position.z)
-
-    def get_loc(self):
-        """
-        Return the latest position data received by the subscriber.
-
-        Returns
-        -------
-        tuple or None
-            The latest position data in the form (x, y, z), or None if no position data has been received.
-        """
-        return copy.copy(self.position)
-
-
-global node
-def main():
-    rclpy.init()  # Initialize ROS 2 environment
-
-    try:
-        node = ROSGPTLocationNode()  # Create your node
-
-        # Execute whatever logic you want with the node.
-        # This could be a spin, a loop, a service call, etc.
-        rclpy.spin(node)  # This will keep your node alive until it's interrupted
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-    finally:
-        node.destroy_node()  # Cleanup your node resources
-        rclpy.shutdown()  # Shutdown ROS 2 environment
-
-if __name__ == '__main__':
-    main()
+import requests
 
 
 class MoveParams(BaseModel):
@@ -88,7 +27,7 @@ class MoveParams(BaseModel):
     
     distance: float = Field(
         ...,
-        description="The distance to move in meters. This value must be a float. The default value is 0.1.")
+        description="The distance to move in meters. This value must be a float. The default value is 0.4")
     
     direction: str = Field(
         ..., 
@@ -160,8 +99,11 @@ class RetrievePOICoordinates(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        if location[0] == "'" or location[-1] == "'":
-            location = location.lstrip("'").rstrip("'")
+        if location[0] == "'":
+            location = location.lstrip("'")
+
+        if location[-1] == "'":
+            location = location.rstrip('"')
 
         if location[-1] == "\n":
             location = location.rstrip("\n")
@@ -193,7 +135,6 @@ class DroneLocationInput(BaseModel):
     location: str = Field(..., description="The location of the drone.")
 
 
-
 class GetDroneLocation(BaseTool):
 
     name = "get_drone_location"
@@ -209,12 +150,24 @@ class GetDroneLocation(BaseTool):
     ) -> str:
         """Use the tool."""
 
-        
-        drone_location = node.get_loc()
+        try:
+            # Make a GET request to the specified URL
+            response = requests.get('http://localhost:5000/get_drone_location')
 
-        print("Drone location: ", drone_location)
+            # Check if the response status code is 200 (OK)
+            if response.status_code == 200:
+                drone_location = response.json()  # Parse the JSON response
+                print("Drone location: ", drone_location)
+                return drone_location
+            else:
+                # Handle non-200 status codes (e.g., 404, 500, etc.)
+                print(f"Error {response.status_code}: {response.text}")
+                return None
 
-        return drone_location
+        except requests.RequestException as e:
+            # Handle potential exceptions (e.g., network issues)
+            print2(f"Request error: {e}")
+            return None
                      
     async def _arun(
         self,
@@ -288,11 +241,8 @@ class ComputeDroneMovements(BaseTool):
 
         # Convert the coordinates string to a tuple
         # Coordinates could be in the form '[drone_x, drone_y, drone_z, poi_x, poi_y, poi_z, speed]'
-        drone_location_tool = GetDroneLocation()
-        current_location = drone_location_tool._run()
-        drone_x, drone_y, drone_z = current_location[0], current_location[1], current_location[2]
         
-        poi_x, poi_y, poi_z, speed = eval(coordinates)
+        drone_x, drone_y, drone_z, poi_x, poi_y, poi_z, speed = eval(coordinates)
 
         x_axis_movement, y_axis_movement, z_axis_movement = "", "", ""
 

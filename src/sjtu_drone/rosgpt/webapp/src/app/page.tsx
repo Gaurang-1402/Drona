@@ -217,13 +217,13 @@ export default function Home() {
       <div className="flex ml-24 flex-col">
         <div className='my-10 grid h-fit grid-cols-4 gap-4 mx-5'>
           <div className='col-span-3 grid grid-cols-2 gap-3'>
-            <div className='drona-card overflow-hidden rounded-xl'>
+            <div className='drona-card overflow-hidden rounded-xl max-h-[500px]'>
               <canvas ref={canvasRef1} width={latestMessageFront?.width} height={latestMessageFront?.height} style={{ display: 'none' }}></canvas>
-              <img src={imgSrcFront??UNSPLASH_IMG} className='w-full max-h-[500px] object-fill' alt="Drone Front Camera Feed" />
+              <img src={imgSrcFront??UNSPLASH_IMG} className='w-full h-full object-fill' alt="Drone Front Camera Feed" />
             </div>
             <div className='drona-card overflow-hidden rounded-xl'>
               <canvas ref={canvasRef2} width={latestMessageBottom?.width} height={latestMessageBottom?.height} style={{ display: 'none' }}></canvas>
-              <img src={imgSrcBottom??UNSPLASH_IMG} className='w-full max-h-[500px] object-fill' alt="Drone Front Camera Feed" />
+              <img src={imgSrcBottom??UNSPLASH_IMG} className='w-full h-full object-fill' alt="Drone Front Camera Feed" />
             </div>
           </div>
 
