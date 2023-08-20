@@ -77,8 +77,8 @@ class POIInput(BaseModel):
 class RetrievePOICoordinates(BaseTool):
     name = "retrieve_poi_coordinates"
     description = ("useful when you want to retrieve the coordinates of the garden or the kitchen.")
+    
     args_schema: Type[BaseModel] = ExtractionInput
-
     def _run(
         self,
         location: str,
@@ -89,8 +89,10 @@ class RetrievePOICoordinates(BaseTool):
             'garden': (10, 30, 2),
             'kitchen': (60, 20, 1)
         }
-
-        return poi_coordinates[location]
+        try:
+            return poi_coordinates[location]
+        except KeyError:
+            raise KeyError(f"Invalid location: {location}. Please try another tool.")
                      
     async def _arun(
         self,
