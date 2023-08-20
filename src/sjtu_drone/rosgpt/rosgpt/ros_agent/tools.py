@@ -195,29 +195,6 @@ class PhraseClarifyingQuestion(BaseTool):
         return question
 
 
-# TODO: Implement this tool  
-# class GetDroneOrientation(BaseTool):
-#     name = "get_drone_orientation"
-#     description = ("useful when you want to retrieve the current orientation of the drone.")
-#     args_schema: Type[BaseModel] = ExtractionInput
-
-#     def _run(
-#         self,
-#         run_manager: Optional[CallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool."""
-#         drone_orientation = 0
-
-#         return drone_orientation
-                     
-#     async def _arun(
-#         self,
-#         run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool asynchronously."""
-#         raise NotImplementedError("Get Drone Orientation does not support async")
-
-
 class DroneToPOIInput(BaseModel):
     coordinates: str = Field(
         ..., 
