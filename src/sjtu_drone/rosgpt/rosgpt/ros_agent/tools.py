@@ -129,7 +129,7 @@ class QuestionInput(BaseModel):
 
 class PhraseClarifyingQuestion(BaseTool):
     name = "phrase_clarifying_question"
-    description = ("useful when you need to ask a clarifying question about a phrase in the command.")
+    description = ("useful when you need to ask a clarifying question about a phrase in the command, or simply tell the user that you don't understand the command.")
     args_schema: Type[BaseModel] = QuestionInput
     return_direct = True
 

@@ -6,9 +6,12 @@ from . import LLM
 
 
 def load_agent():
-    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English.
-    If what you are given is not a command, or is not relevant for managing the drone, you should ignore it return a message saying so.
-    If there is anything that is unclear or ambiguous, you should ask for clarification.
+    PREFIX = f"""You are an interpreter for a drone. You will be given a message in English.
+    The message may not be a complete sentence, or it may be multiple sentences. It may also be
+    non-direct or ambiguous. You must read the message and interpret the command.
+    
+    If what you are given is not a command, or is not relevant for managing the drone, you should return a message to the user
+    restating that the user should give you a command to manage the drone, and the message provided by the user can't be interpreted as a command.
 
     First, you must think about what the command means, and plan out the exact steps you will take to execute the command.
     Even if the command is a single step, you should still plan out the steps you will take to execute the command.
@@ -67,7 +70,6 @@ def load_agent():
     If you're returning a message, just return the string.
     """
 
-    tools = load_tools(['human'], llm=LLM)
     # TODO: if the response is non conclusive?
     # if chatgpt_response and chatgpt_response.need_more_info:
     #     # if you send this thing, next time the client will send an array of [text_command]
@@ -75,6 +77,7 @@ def load_agent():
     #         'require_more_info': True,
     #         'help_text': chatgpt_response.help_text
     #     }
+    tools = []
     tools.append(CustomCommandToJSON())
     tools.append(RetrievePOICoordinates())
     tools.append(ComputeDroneMovements())
