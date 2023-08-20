@@ -55,7 +55,13 @@ class DroneController(Node):
         self.takeoff_publisher = self.create_publisher(Empty, '/drone/takeoff', 10)
         self.land_publisher = self.create_publisher(Empty, '/drone/land', 10)
 
-        # self.create_timer(2.0, self.publish_velocity)
+        # Defining states for hovering
+        # 0: No Hovering
+        # 1: Start Hovering
+        # 2: Hovering
+        self.create_timer(2.0, self.hover)
+        self.hovering = 0
+        self.z_hover = 0
         
         self.thread_executor = ThreadPoolExecutor(max_workers=1)
 
@@ -71,13 +77,34 @@ class DroneController(Node):
         self.theta = msg.orientation
         self.pose = msg
 
+    def hover(self):
+        if self.hovering == 0:
+            return
+        elif self.hovering == 1:
+            self.z_hover = self.pose.position.z
+            self.hovering = 2
+        elif self.hovering == 2:
+            print("Hovering")
+            vel_msg = Twist()
+            vel_msg.linear.x = 0.0
+            vel_msg.linear.y = 0.0
+            vel_msg.linear.z = 0.15 * (self.z_hover - self.pose.position.z)
+            vel_msg.angular.x = 0.0
+            vel_msg.angular.y = 0.0
+            vel_msg.angular.z = 0.0
+            self.velocity_publisher.publish(vel_msg)
+
     def takeoff(self):
         takeoff_msg = Empty()
         self.takeoff_publisher.publish(takeoff_msg)
+        time.sleep(3)
+        self.hovering = 1
 
     def land(self):
         land_msg = Empty()
         self.land_publisher.publish(land_msg)
+        time.sleep(3)
+        self.hovering = 0
 
     def stop(self):
         vel_msg = Twist()
@@ -192,6 +219,9 @@ class DroneController(Node):
 
         twist_msg = Twist()
         twist_msg.linear = linear_vector
+        
+        self.stop()
+        self.hovering = 0
 
         try:
             start_pose = copy.copy(self.pose)
@@ -201,6 +231,9 @@ class DroneController(Node):
             while self.get_distance(start_pose, self.pose) < distance:
 
                 print('distance moved: ', self.get_distance(start_pose, self.pose))
+                
+                if linear_vector.z == 0:
+                    twist_msg.linear.z = 0.15 * (start_pose.position.z - self.pose.position.z)
 
                 self.velocity_publisher.publish(twist_msg)
                 self.move_executor.spin_once(timeout_sec=0.5)
@@ -208,13 +241,11 @@ class DroneController(Node):
 
             print('[Exception] An unexpected error occurred:', str(e))
 
-        twist_msg.linear.x = 0.0
-        twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
 
         print("Stopping the drone ...")
+        self.stop()
+        self.hovering = 1
 
-        self.velocity_publisher.publish(twist_msg)
 
         # print('distance moved: ', self.get_distance(start_pose, self.pose))
         print('The Robot has stopped...')
@@ -226,6 +257,7 @@ class DroneController(Node):
 
         print("Stopping the drone ...")
         self.stop()
+        self.hovering = 0
 
         twist_msg=Twist()
         angular_speed_degree=abs(angular_speed_degree) #make sure it is a positive relative angle
@@ -245,7 +277,9 @@ class DroneController(Node):
         rotated_related_angle_degree=0.0
 
         while rotated_related_angle_degree<desired_relative_angle_degree:
+            twist_msg.linear.z = 0.15 * (start_pose.position.z - self.pose.position.z)
             self.velocity_publisher.publish(twist_msg)
+
             start_theta = quat2Yaw(start_pose.orientation.w, start_pose.orientation.x, start_pose.orientation.y, start_pose.orientation.z)
             pose_theta = quat2Yaw(self.pose.orientation.w, self.pose.orientation.x, self.pose.orientation.y, self.pose.orientation.z)
             rotated_related_angle_degree = math.degrees(abs(start_theta - pose_theta))
@@ -255,6 +289,7 @@ class DroneController(Node):
         print ('rotated_related_angle_degree', rotated_related_angle_degree, 'desired_relative_angle_degree', desired_relative_angle_degree)
 
         self.stop()
+        self.hovering = 1
         print('The Robot has stopped...')
 
         return 0
