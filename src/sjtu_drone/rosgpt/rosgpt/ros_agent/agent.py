@@ -1,17 +1,17 @@
 from langchain.chat_models.openai import ChatOpenAI
 from langchain.agents import AgentType, initialize_agent, load_tools
-from .tools import CustomCommandToJSON
+from langchain.tools import StructuredTool
+from .tools import CustomCommandToJSON, RetrievePOICoordinates, ComputeDroneMovements
 from . import LLM
 
 
 def load_agent():
-    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English. 
-
+    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English.
     If what you are given is not a command, or is not relevant for managing the drone, you should ignore it return a message saying so.
+    If there is anything that is unclear or ambiguous, you should ask for clarification.
 
-    First, you must think about what the command means. If there are multiple steps in the command, you must plan out
-    each step for the drone to follow sequentially. You may only command the drone to move, land, or takeoff. If it
-    is a single command and you don't need to create a plan, you must still return a JSON object the drone can understand.
+    First, you must think about what the command means, and plan out the exact steps you will take to execute the command.
+    Even if the command is a single step, you should still plan out the steps you will take to execute the command.
 
     After you have planned out the steps, you must format each step into a JSON object that the drone can understand. You should
     use the command_to_json tool to help you. Note: you may only pass a single command to the tool at a time. 
@@ -68,6 +68,8 @@ def load_agent():
 
     tools = load_tools(['human'], llm=LLM)
     tools.append(CustomCommandToJSON())
+    tools.append(RetrievePOICoordinates())
+    tools.append(ComputeDroneMovements())
 
     agent = initialize_agent(
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
