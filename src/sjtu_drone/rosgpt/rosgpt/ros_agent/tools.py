@@ -1,10 +1,83 @@
 from kor import create_extraction_chain, from_pydantic
-from typing import Optional, Type, Tuple
+from typing import Any, Optional, Type, Tuple
 from pydantic import BaseModel, Field
 from langchain.tools import BaseTool
 from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
 from langchain.chat_models.openai import ChatOpenAI
 from . import LLM
+import rclpy
+import threading
+from rclpy.node import Node
+from std_msgs.msg import String
+from rclpy.executors import SingleThreadedExecutor
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+from geometry_msgs.msg import Pose
+import traceback
+import copy
+
+class ROSGPTLocationNode(Node):
+    def __init__(self):
+        """
+        Initialize the ROSGPTNode class which is derived from the rclpy Node class.
+        """
+        super().__init__('chatgpt_ros2_node')
+        
+        # Subscribe to the 'position_data' topic
+        self.subscription = self.create_subscription(
+            Pose, 
+            '/drone/gt_pose', 
+            self.position_callback, 
+            10)
+        
+        self.subscription
+        self.position = None  # Initialize the position attribute to None
+
+
+    def position_callback(self, msg):
+        """
+        Callback function that gets executed whenever a new position message is received.
+
+        Parameters
+        ----------
+        msg : PointStamped
+            The received message containing position data.
+        """
+        self.position = (msg.position.x, msg.position.y, msg.position.z)
+
+    def get_loc(self):
+        """
+        Return the latest position data received by the subscriber.
+
+        Returns
+        -------
+        tuple or None
+            The latest position data in the form (x, y, z), or None if no position data has been received.
+        """
+        return copy.copy(self.position)
+
+
+global node
+def main():
+    rclpy.init()  # Initialize ROS 2 environment
+
+    try:
+        node = ROSGPTLocationNode()  # Create your node
+
+        # Execute whatever logic you want with the node.
+        # This could be a spin, a loop, a service call, etc.
+        rclpy.spin(node)  # This will keep your node alive until it's interrupted
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    finally:
+        node.destroy_node()  # Cleanup your node resources
+        rclpy.shutdown()  # Shutdown ROS 2 environment
+
+if __name__ == '__main__':
+    main()
 
 
 class MoveParams(BaseModel):
@@ -29,6 +102,8 @@ class Command(BaseModel):
         enum=["land", "takeoff", "move", "stop"]
     )
     params: Optional[MoveParams]
+
+
 
 
 class ExtractionInput(BaseModel):
@@ -85,6 +160,12 @@ class RetrievePOICoordinates(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
+        if location[0] == "'" or location[-1] == "'":
+            location = location.lstrip("'").rstrip("'")
+
+        if location[-1] == "\n":
+            location = location.rstrip("\n")
+
         poi_coordinates = {
             'corn_garden': (-10, -10, 1),
             'tree_garden': (5, -5, 3)
@@ -93,7 +174,11 @@ class RetrievePOICoordinates(BaseTool):
             coords = poi_coordinates[location]
             return coords
         except KeyError:
-            return(f"Invalid location: {location}. Please try another tool.")
+                # Capture the traceback as a string
+            tb_str = traceback.format_exc()
+
+            # Print or do something with the traceback string
+            return(f"Error Received: {tb_str}\n Invalid location: {location}. Please try another tool.")
                      
     async def _arun(
         self,
@@ -103,16 +188,31 @@ class RetrievePOICoordinates(BaseTool):
         """Use the tool asynchronously."""
         raise NotImplementedError("Retrieve POI Coordinates does not support async")
 
+
+class DroneLocationInput(BaseModel):
+    location: str = Field(..., description="The location of the drone.")
+
+
+
 class GetDroneLocation(BaseTool):
+
     name = "get_drone_location"
-    description = ("useful when you want to retrieve the current location of the drone.")
+    description = ("useful when you want to retrieve the current location of the drone."
+                   "The location is returned as a tuple of the form (x, y, z)."
+                   "The tool must always be used when calculating drone movements when required to go to a specific location like corn garden or tree garden or disaster site."
+                   "get_drone_location must be used before compute_drone_movements.")
 
     def _run(
         self,
+        location: DroneLocationInput,
         run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        drone_location = (10, 20, 1)
+
+        
+        drone_location = node.get_loc()
+
+        print("Drone location: ", drone_location)
 
         return drone_location
                      
@@ -187,20 +287,26 @@ class ComputeDroneMovements(BaseTool):
         """Use the tool."""
 
         # Convert the coordinates string to a tuple
-        # Coordinates could be in the form '[drone_x, drone_y, poi_x, poi_y]'
-        drone_x, drone_y, drone_z, poi_x, poi_y, poi_z, speed = eval(coordinates)
+        # Coordinates could be in the form '[drone_x, drone_y, drone_z, poi_x, poi_y, poi_z, speed]'
+        drone_location_tool = GetDroneLocation()
+        current_location = drone_location_tool._run()
+        drone_x, drone_y, drone_z = current_location[0], current_location[1], current_location[2]
+        
+        poi_x, poi_y, poi_z, speed = eval(coordinates)
 
-        # Calculate x axis movement (left/right)
+        x_axis_movement, y_axis_movement, z_axis_movement = "", "", ""
+
+        # Calculate x axis movement (forward/backward)
         if drone_x < poi_x:
-            x_axis_movement = f"The drone should move right {poi_x - drone_x} meters at {speed} meters per second"
+            x_axis_movement = f"The drone should move forward {poi_x - drone_x} meters at {speed} meters per second"
         elif drone_x > poi_x:
-            x_axis_movement = f"The drone should move left {drone_x - poi_x} meters at {speed} meters per second"
+            x_axis_movement = f"The drone should move backward {drone_x - poi_x} meters at {speed} meters per second"
 
-        # Calculate y axis movement (forward/backward)
+        # Calculate y axis movement (left/right)
         if drone_y < poi_y:
-            y_axis_movement = f"The drone should move forward {poi_y - drone_y} meters at {speed} meters per second"
+            y_axis_movement = f"The drone should move left {poi_y - drone_y} meters at {speed} meters per second"
         elif drone_y > poi_y:
-            y_axis_movement = f"The drone should move backward {drone_y - poi_y} meters at {speed} meters per second"
+            y_axis_movement = f"The drone should move right {drone_y - poi_y} meters at {speed} meters per second"
 
         # Calculate z axis movement (up/down)
         if drone_z < poi_z:

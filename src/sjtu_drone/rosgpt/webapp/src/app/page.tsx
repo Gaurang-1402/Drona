@@ -15,10 +15,11 @@ export default function Home() {
   const [imgSrcFront, setImgSrcFront] = useState<string | null>(null);
   const [imgSrcBottom, setImgSrcBottom] = useState<string | null>(null);
 
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef1 = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef2 = useRef<HTMLCanvasElement | null>(null);
 
-  const [latestMessageFront, setLatestMessageFront] = useState(null);
-  const [latestMessageBottom, setLatestMessageBottom] = useState(null);
+  const [latestMessageFront, setLatestMessageFront] = useState<any>(null);
+  const [latestMessageBottom, setLatestMessageBottom] = useState<any>(null);
 
 
   useEffect(() => {
@@ -43,37 +44,37 @@ export default function Home() {
     });
 
 
-    function base64ToArrayBuffer(base64) {
+    function base64ToArrayBuffer(base64: any) {
       var binaryString = window.atob(base64);
       var binaryLen = binaryString.length;
       var bytes = new Uint8Array(binaryLen);
       for (let i = 0; i < binaryLen; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
+        bytes[i] = binaryString.charCodeAt(i);
       }
       return bytes;
-  }
+    }
 
 
     imageTopicFront.subscribe((message: any) => {
-        // Update the state with the latest message
-        setLatestMessageFront(message);
+      // Update the state with the latest message
+      setLatestMessageFront(message);
 
-      if (canvasRef.current) {
-        const canvas = canvasRef.current;
+      if (canvasRef1.current) {
+        const canvas = canvasRef1.current;
         const ctx = canvas.getContext('2d');
         if (ctx) {
           const imgData = ctx.createImageData(message.width, message.height);
           let j = 0;
-  
-        const rawPixelData = base64ToArrayBuffer(message.data);
-        
+
+          const rawPixelData = base64ToArrayBuffer(message.data);
+
           for (let i = 0; i < rawPixelData.length; i += 3) {
             imgData.data[j++] = rawPixelData[i];     // Red
             imgData.data[j++] = rawPixelData[i + 1]; // Green
             imgData.data[j++] = rawPixelData[i + 2]; // Blue
             imgData.data[j++] = 255;                 // Alpha (fully opaque)
           }
-          
+
           ctx.putImageData(imgData, 0, 0);
           // Convert canvas to image source
           const imageUrl = canvas.toDataURL()
@@ -89,33 +90,33 @@ export default function Home() {
       setLatestMessageBottom(message);
 
 
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        const imgData = ctx.createImageData(message.width, message.height);
-        let j = 0;
-  
+      if (canvasRef2.current) {
+        const canvas = canvasRef2.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const imgData = ctx.createImageData(message.width, message.height);
+          let j = 0;
 
-      
-      const rawPixelData = base64ToArrayBuffer(message.data);
-      
-        for (let i = 0; i < rawPixelData.length; i += 3) {
-          imgData.data[j++] = rawPixelData[i];     // Red
-          imgData.data[j++] = rawPixelData[i + 1]; // Green
-          imgData.data[j++] = rawPixelData[i + 2]; // Blue
-          imgData.data[j++] = 255;                 // Alpha (fully opaque)
+
+
+          const rawPixelData = base64ToArrayBuffer(message.data);
+
+          for (let i = 0; i < rawPixelData.length; i += 3) {
+            imgData.data[j++] = rawPixelData[i];     // Red
+            imgData.data[j++] = rawPixelData[i + 1]; // Green
+            imgData.data[j++] = rawPixelData[i + 2]; // Blue
+            imgData.data[j++] = 255;                 // Alpha (fully opaque)
+          }
+
+          ctx.putImageData(imgData, 0, 0);
+          // Convert canvas to image source
+          const imageUrl = canvas.toDataURL()
+
+          setImgSrcBottom(imageUrl);
         }
-        
-        ctx.putImageData(imgData, 0, 0);
-        // Convert canvas to image source
-        const imageUrl = canvas.toDataURL()
-
-        setImgSrcBottom(imageUrl);
       }
-    }
-  });
-    
+    });
+
   }, []);
 
 
@@ -128,7 +129,7 @@ export default function Home() {
       toast.info("sending cmd to robot..");
       setPrompt('')
 
-      const data=new URLSearchParams({
+      const data = new URLSearchParams({
         text_command: [...lastCommands, currentPrompt].join('. ')
       })
       // data.append('text_command', [...lastCommands, currentPrompt].join('. '))
@@ -144,16 +145,16 @@ export default function Home() {
       let jsonResponse = await response.json();
       console.log("Received response from robot:", jsonResponse);
 
-      if(response.status !== 200){
-        throw new Error(jsonResponse.message??'Something went wrong.')
+      if (response.status !== 200) {
+        throw new Error(jsonResponse.message ?? 'Something went wrong.')
       }
 
-      if(jsonResponse.error){
+      if (jsonResponse.error) {
         toast.error(jsonResponse.error)
-      }else if(jsonResponse.require_more_info){
-        toast.error(jsonResponse.help_text??'we need more info.')
+      } else if (jsonResponse.require_more_info) {
+        toast.error(jsonResponse.help_text ?? 'we need more info.')
         setLastCommands([...lastCommands, currentPrompt])
-      }else{
+      } else {
         // enjoy!!!!
         setLastCommands([])
         toast.success(jsonResponse.response)
@@ -213,14 +214,16 @@ export default function Home() {
 
       <div className="flex flex-col">
         <div className='my-10 grid h-fit grid-cols-4 gap-4 mx-5'>
-          <div className='drona-card col-span-3 overflow-hidden rounded-xl'>
-
-            <canvas ref={canvasRef} width={latestMessageFront?.width} height={latestMessageFront?.height} style={{ display: 'none' }}></canvas>
-            {imgSrcFront && <img src={imgSrcFront} alt="Drone Front Camera Feed" />}
-
-            <canvas ref={canvasRef} width={latestMessageBottom?.width} height={latestMessageBottom?.height} style={{ display: 'none' }}></canvas>
-            {imgSrcBottom && <img src={imgSrcBottom} alt="Drone Front Camera Feed" />}
+          <div className='col-span-3 flex gap-3 flex-col'>
+            <div className='drona-card overflow-hidden rounded-xl'>
+              <canvas ref={canvasRef1} width={latestMessageFront?.width} height={latestMessageFront?.height} style={{ display: 'none' }}></canvas>
+              {imgSrcFront && <img src={imgSrcFront} className='object-fill' alt="Drone Front Camera Feed" />}
             </div>
+            <div className='drona-card overflow-hidden rounded-xl'>
+              <canvas ref={canvasRef2} width={latestMessageBottom?.width} height={latestMessageBottom?.height} style={{ display: 'none' }}></canvas>
+              {imgSrcBottom && <img src={imgSrcBottom} alt="Drone Front Camera Feed" />}
+            </div>
+          </div>
 
 
           <div className='drona-card px-7 py-5 text-sm h-fit rounded-xl'>
