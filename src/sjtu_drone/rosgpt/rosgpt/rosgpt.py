@@ -160,6 +160,8 @@ class ROSGPTProxy(Resource):
 
         text_command = request.form['text_command']
 
+        print('subhmx', text_command)
+
         if text_command.startswith('[') and text_command.endswith(']'):
             text_command = json.loads(text_command)
         else:
@@ -167,6 +169,8 @@ class ROSGPTProxy(Resource):
         
         print(text_command)
         chatgpt_response = self.agent.run(text_command)
+
+        print('subhmx122', chatgpt_response)
 
         if not chatgpt_response:
             return {'error': 'An error occurred while processing the request'}
@@ -178,10 +182,14 @@ class ROSGPTProxy(Resource):
                 'help_text': chatgpt_response
             }
         else:
+            print('subhmx123: response was successful')
             threading.Thread(
                 target=process_and_publish_chatgpt_response, 
                 args=(self.chatgpt_ros2_node, text_command, chatgpt_response, True)).start()
-            return json.loads(chatgpt_response)
+            return {
+                'response': "Captain, your command is being executed now!",
+                'chatgpt_response': chatgpt_response
+            }
 
 @app.route('/')
 def index():

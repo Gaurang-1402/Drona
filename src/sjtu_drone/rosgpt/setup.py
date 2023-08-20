@@ -13,7 +13,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, "prompts"), glob('prompts/*')),
-        (os.path.join('share', package_name, 'webapp'), glob('webapp/*'))
+        # (os.path.join('share', package_name, 'webapp'), glob('webapp/*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

@@ -20,14 +20,17 @@ export default function Home() {
       toast.info("sending cmd to robot..");
       setPrompt('')
 
+      const data=new URLSearchParams({
+        text_command: [...lastCommands, currentPrompt].join('. ')
+      })
+      // data.append('text_command', [...lastCommands, currentPrompt].join('. '))
+
       let response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rosgpt`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: JSON.stringify({
-          text_command: [...lastCommands, currentPrompt]
-        }),
+        body: data,
       });
 
       let jsonResponse = await response.json();

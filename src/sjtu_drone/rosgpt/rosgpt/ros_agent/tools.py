@@ -76,7 +76,7 @@ class POIInput(BaseModel):
 
 class RetrievePOICoordinates(BaseTool):
     name = "retrieve_poi_coordinates"
-    description = ("useful when you want to retrieve the coordinates of the garden or the kitchen.")
+    description = ("useful when you want to retrieve the coordinates of the corn_garden or the tree_garden.")
     
     args_schema: Type[BaseModel] = ExtractionInput
     def _run(
@@ -86,8 +86,8 @@ class RetrievePOICoordinates(BaseTool):
     ) -> str:
         """Use the tool."""
         poi_coordinates = {
-            'garden': (10, 30, 2),
-            'kitchen': (60, 20, 1)
+            'corn_garden': (-10, -10, 1),
+            'tree_garden': (5, -5, 3)
         }
         try:
             coords = poi_coordinates[location]
