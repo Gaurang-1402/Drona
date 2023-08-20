@@ -55,11 +55,13 @@ def load_agent():
 
     Example:
 
-    prompt = '''
-    Consider the following ontology:
-    {"action": "land", "params": {}}
-    {"action": "takeoff", "params": {}}
-    {"action": "move", "params": {"linear_speed": linear_speed, "distance": distance, "direction": direction}}
+    Ontology:
+
+    [{'command': {'action': 'land', 'params': {}}}]
+    [{'command': {'action': 'takeoff', 'params': {}}}]
+    [{'command': {'action': 'move', 'params': {'linear_speed': linear_speed, 'distance': distance, 'direction': direction}}}]
+    [{'command': {'action': 'stop', 'params': {}}}]
+
 
     You may get a command in another language, translate it to English and then create the JSON.
 
@@ -72,36 +74,38 @@ def load_agent():
     Thought: The command instructs the drone to takeoff first and then move forward for a specific distance and speed.
     Action: Convert to JSON format
     Action Input: "takeoff and Move forward for 1 meter at a speed of 0.5 meters per second."
-    Observation: [{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}]
+    Observation: [{"command": {"action": "takeoff", "params": {}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 1.0, "direction": "forward"}}}]
     Thought: I have broken the command out into discrete steps for the drone to follow formatted in the appropriate way.
-    Final Answer: '[{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "forward"}}]'
-    '''    
+    Final Answer: '[{"command": {"action": "takeoff", "params": {}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 1.0, "direction": "forward"}}}]'
+    '''
 
     prompt = '''Command: "Land."
-        Thought: The command instructs the drone to land.
-        Action: Convert to JSON format
-        Action Input: "Land."
-        Observation: {"action": "land", "params": {}}
-        Thought: I have converted the command into a JSON format suitable for the drone.
-        Final Answer: '[{"action": "land", "params": {}}]'
+    Thought: The command instructs the drone to land.
+    Action: Convert to JSON format
+    Action Input: "Land."
+    Observation: [{"command": {"action": "land", "params": {}}}]
+    Thought: I have converted the command into a JSON format suitable for the drone.
+    Final Answer: '[{"command": {"action": "land", "params": {}}}]'
     '''
-    Note: The "Example" is just a demonstration of how the instructions are utilized in a practical scenario. It's not the exact execution but a representation.
+
+    Examples:
 
     Command: "Takeoff, move forward for 3 meters, then land."
     Thought: The command instructs the drone to takeoff, move forward, and then land.
     Action: Convert to JSON format
     Action Input: "Takeoff, move forward for 3 meters, then land."
-    Observation: [{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 3, "direction": "forward"}}, {"action": "land", "params": {}}]
+    Observation: [{"command": {"action": "takeoff", "params": {}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 3.0, "direction": "forward"}}}, {"command": {"action": "land", "params": {}}}]
     Thought: I have broken the command into discrete steps for the drone.
-    Final Answer: '[{"action": "takeoff", "params": {}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 3, "direction": "forward"}}, {"action": "land", "params": {}}]'
+    Final Answer: '[{"command": {"action": "takeoff", "params": {}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 3.0, "direction": "forward"}}}, {"command": {"action": "land", "params": {}}}]'
 
     Command: "Move left for 2 meters, move upwards for 1 meter, then stop."
     Thought: The command instructs the drone to move left, then move upwards, followed by a stop.
     Action: Convert to JSON format
     Action Input: "Move left for 2 meters, move upwards for 1 meter, then stop."
-    Observation: [{"action": "move", "params": {"linear_speed": 0.5, "distance": 2, "direction": "left"}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "up"}}, {"action": "stop", "params": {}}]
+    Observation: [{"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 2.0, "direction": "left"}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 1.0, "direction": "up"}}}, {"command": {"action": "stop", "params": {}}}]
     Thought: I have parsed the commands sequentially for the drone.
-    Final Answer: '[{"action": "move", "params": {"linear_speed": 0.5, "distance": 2, "direction": "left"}}, {"action": "move", "params": {"linear_speed": 0.5, "distance": 1, "direction": "up"}}, {"action": "stop", "params": {}}]'
+    Final Answer: '[{"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 2.0, "direction": "left"}}}, {"command": {"action": "move", "params": {"linear_speed": 0.5, "distance": 1.0, "direction": "up"}}}, {"command": {"action": "stop", "params": {}}}]'
+
 
     """
 

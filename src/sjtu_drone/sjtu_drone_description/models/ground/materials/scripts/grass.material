@@ -8,7 +8,7 @@ material grassColor/Green
       {
          texture_unit
          {
-            texture grass_color.jpg
+            texture grass_roughness.jpg
          }
       }
    }

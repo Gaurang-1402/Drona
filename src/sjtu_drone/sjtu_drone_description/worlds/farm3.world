@@ -71,7 +71,7 @@
     </model>
     <model name='ground_plane_2'>
       <static>1</static>
-      <pose>10 10 0.01 0 -0 0</pose>
+      <pose>-10 -10 0.01 0 -0 0</pose>
       <link name='link'>
         <collision name='collision'>
           <geometry>
