@@ -356,11 +356,6 @@ void DroneSimpleController::CmdCallback(const geometry_msgs::msg::Twist::SharedP
   }
   time_counter_for_drift_noise += dt;
 
-  cmd_val.angular.x += drift_noise[0] + 2*motion_small_noise_*(drand48()-0.5);
-  cmd_val.angular.y += drift_noise[1] + 2*motion_small_noise_*(drand48()-0.5);
-  cmd_val.angular.z += drift_noise[3] + 2*motion_small_noise_*(drand48()-0.5);
-  cmd_val.linear.z += drift_noise[2] + 2*motion_small_noise_*(drand48()-0.5);
-
 }
 
 /**

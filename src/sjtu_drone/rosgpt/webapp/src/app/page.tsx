@@ -5,10 +5,118 @@ import { TrendingQuestions } from './TrendingQuestions'
 import TimeComponent from './TimeComponent'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { useEffect, useRef } from 'react';
+import ROSLIB from 'roslib';
 
 export default function Home() {
   const [lastCommands, setLastCommands] = useState<string[]>([])
   const [currentPrompt, setPrompt] = useState('')
+
+  const [imgSrcFront, setImgSrcFront] = useState<string | null>(null);
+  const [imgSrcBottom, setImgSrcBottom] = useState<string | null>(null);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const [latestMessageFront, setLatestMessageFront] = useState(null);
+  const [latestMessageBottom, setLatestMessageBottom] = useState(null);
+
+
+  useEffect(() => {
+    const ros = new ROSLIB.Ros({
+      url: 'ws://localhost:9090' // replace localhost with your ROS2 machine IP if different
+    });
+
+    ros.on('connection', () => {
+      console.log('Connected to rosbridge WebSocket server.');
+    });
+
+    const imageTopicFront = new ROSLIB.Topic({
+      ros: ros,
+      name: '/drone/front/image_raw',
+      messageType: 'sensor_msgs/msg/Image'
+    });
+
+    const imageTopicBottom = new ROSLIB.Topic({
+      ros: ros,
+      name: '/drone/bottom/image_raw',
+      messageType: 'sensor_msgs/msg/Image'
+    });
+
+
+    function base64ToArrayBuffer(base64) {
+      var binaryString = window.atob(base64);
+      var binaryLen = binaryString.length;
+      var bytes = new Uint8Array(binaryLen);
+      for (let i = 0; i < binaryLen; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
+  }
+
+
+    imageTopicFront.subscribe((message: any) => {
+        // Update the state with the latest message
+        setLatestMessageFront(message);
+
+      if (canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const imgData = ctx.createImageData(message.width, message.height);
+          let j = 0;
+  
+        const rawPixelData = base64ToArrayBuffer(message.data);
+        
+          for (let i = 0; i < rawPixelData.length; i += 3) {
+            imgData.data[j++] = rawPixelData[i];     // Red
+            imgData.data[j++] = rawPixelData[i + 1]; // Green
+            imgData.data[j++] = rawPixelData[i + 2]; // Blue
+            imgData.data[j++] = 255;                 // Alpha (fully opaque)
+          }
+          
+          ctx.putImageData(imgData, 0, 0);
+          // Convert canvas to image source
+          const imageUrl = canvas.toDataURL()
+
+          setImgSrcFront(imageUrl);
+        }
+      }
+    });
+
+
+    imageTopicBottom.subscribe((message: any) => {
+      // Update the state with the latest message
+      setLatestMessageBottom(message);
+
+
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const imgData = ctx.createImageData(message.width, message.height);
+        let j = 0;
+  
+
+      
+      const rawPixelData = base64ToArrayBuffer(message.data);
+      
+        for (let i = 0; i < rawPixelData.length; i += 3) {
+          imgData.data[j++] = rawPixelData[i];     // Red
+          imgData.data[j++] = rawPixelData[i + 1]; // Green
+          imgData.data[j++] = rawPixelData[i + 2]; // Blue
+          imgData.data[j++] = 255;                 // Alpha (fully opaque)
+        }
+        
+        ctx.putImageData(imgData, 0, 0);
+        // Convert canvas to image source
+        const imageUrl = canvas.toDataURL()
+
+        setImgSrcBottom(imageUrl);
+      }
+    }
+  });
+    
+  }, []);
 
 
   const handleSubmit = async (e: any) => {
@@ -105,10 +213,13 @@ export default function Home() {
       <div className="flex flex-col">
         <div className='my-10 grid h-fit grid-cols-4 gap-4 mx-5'>
           <div className='drona-card col-span-3 overflow-hidden rounded-xl'>
-            <video loop muted autoPlay={true} className='w-full h-[500px] object-fill overflow-hidden rounded-xl' >
-              <source src="/sample_feed.mp4" type="video/mp4" />
-            </video>
-          </div>
+
+            <canvas ref={canvasRef} width={latestMessageFront?.width} height={latestMessageFront?.height} style={{ display: 'none' }}></canvas>
+            {imgSrcFront && <img src={imgSrcFront} alt="Drone Front Camera Feed" />}
+
+            <canvas ref={canvasRef} width={latestMessageBottom?.width} height={latestMessageBottom?.height} style={{ display: 'none' }}></canvas>
+            {imgSrcBottom && <img src={imgSrcBottom} alt="Drone Front Camera Feed" />}
+            </div>
 
 
           <div className='drona-card px-7 py-5 text-sm h-fit rounded-xl'>

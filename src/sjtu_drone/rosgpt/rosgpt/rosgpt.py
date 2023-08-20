@@ -34,7 +34,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from .ros_agent.agent import load_agent
+from ros_agent.agent import load_agent
 
 # Instantiate a Flask application object with the given name
 app = Flask(__name__)

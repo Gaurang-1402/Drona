@@ -1,0 +1,72 @@
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <actor name="actor">
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <trajectory id="0" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>5 5 0 0 0 -1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>5 -5 0 0 0 -1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>15</time>
+            <pose>5 -5 0 0 0 -3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>25</time>
+            <pose>-5 -5 0 0 0 -3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>30</time>
+            <pose>-5 -5 0 0 0 1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>40</time>
+            <pose>-5 5 0 0 0 1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>45</time>
+            <pose>-5 5 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>55</time>
+            <pose>5 5 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>60</time>
+            <pose>5 5 0 0 0 -1.57</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+
+    <plugin name="actor_01_odometry_spine" filename="libgazebo_ros_p3d.so">
+    <namespace>actor</namespace>
+    <alwaysOn>true</alwaysOn>
+    <updateRate>100.0</updateRate>
+    <body_name>actor_pose</body_name>
+    <topicName>actor_01_odometry_spine</topicName>
+    <gaussianNoise>0.01</gaussianNoise>
+    <frameName>map</frameName>
+    <xyzOffsets>0 0 0</xyzOffsets>
+    <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+
+    </actor>
+  </world>
+</sdf>
