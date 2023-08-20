@@ -20,7 +20,7 @@ export default function Home() {
       toast.info("sending cmd to robot..");
       setPrompt('')
 
-      let response = await fetch(`${process.env.NEXT_APP_SERVER_URL}/rosgpt`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/rosgpt`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
