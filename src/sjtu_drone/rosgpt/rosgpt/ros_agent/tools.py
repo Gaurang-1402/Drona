@@ -37,12 +37,10 @@ class MoveParams(BaseModel):
 class Command(BaseModel):
     action: str = Field(
         ...,
-        description="The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`.",
-        enum=["land", "takeoff", "move", "stop"]
+        description="The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`, `follow`, `unfollow`.",
+        enum=["land", "takeoff", "move", "stop", "follow", "unfollow"]
     )
     params: Optional[MoveParams]
-
-
 
 
 class ExtractionInput(BaseModel):
@@ -52,6 +50,8 @@ schema, validator = from_pydantic(
     Command,
     examples=[
         ("Land the drone.", {"action": "land"}),
+        ("Follow the human.", {"action": "follow"}),
+        ("Unfollow the human.", {"action": "unfollow"}),
         ("Takeoff the drone.", {"action": "takeoff"}),
         ("Move down for 2 meters at a speed of 0.4 meters per second.",
             {"action": "move",

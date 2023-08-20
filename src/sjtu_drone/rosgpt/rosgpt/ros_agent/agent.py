@@ -23,7 +23,7 @@ def load_agent():
 
     Each json_command is a JSON object that must contain a "command" key.
 
-    The value associated with the "command" key is an object that must have an action field, which specifies what action the drone should take. This can be one of four strings: "land", "takeoff", "move", or "stop".
+    The value associated with the "command" key is an object that must have an action field, which specifies what action the drone should take. This can be one of four strings: "land", "takeoff", "move", or "stop", "follow", "unfollow.
 
     If the action field is set to "move", then the object associated with the "command" key must also contain a params field, which is an object that provides details about the move action. This object has three fields:
     a. linear_speed: A number between 0 and 1 that specifies the linear speed of the drone in meters per second. The default value is 0.1.
@@ -186,7 +186,7 @@ def load_agent():
     ```TypeScript
 
     command: { // 
-    action: string // The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`.
+    action: string // The action to perform. This can be one of `land`, `takeoff`, `move`, `stop`, `follow`, `unfollow`.
     params: { // 
     linear_speed: number // The linear speed of the drone in meters per second. The default value is 0.1. This value must be between 0 and 1.
     distance: number // The distance to move in meters. This value must be between -1 and 1. The default value is 0.1.

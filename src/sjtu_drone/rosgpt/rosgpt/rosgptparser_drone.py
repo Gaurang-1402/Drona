@@ -152,25 +152,22 @@ class DroneController(Node):
                     elif cmd["action"] == 'stop':
                         self.thread_executor.submit(self.stop)
 
-                elif cmd["action"] == 'follow':
-                    self.thread_executor.submit(self.follow)
+                    elif cmd["action"] == 'follow':
+                        self.thread_executor.submit(self.follow)
 
-                elif cmd["action"] == 'unfollow':
-                    self.hovering = 1
+                    elif cmd["action"] == 'unfollow':
+                        self.hovering = 1
 
-                elif cmd["action"] == 'move':
-                    linear_speed = cmd["params"].get('linear_speed', 0.2)
-                    distance = cmd["params"].get('distance', 1.0)
-                    direction = cmd["params"].get('direction', "forward")
+                    elif cmd["action"] == 'move':
+                        linear_speed = cmd["params"].get('linear_speed', 0.2)
+                        distance = cmd["params"].get('distance', 1.0)
+                        direction = cmd["params"].get('direction', "forward")
 
                         print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
                         
                         # METHOD: Create a thread executor
                         # we need to run the method on a different thread to avoid blocking rclpy.spin. 
                         self.thread_executor.submit(self.move, linear_speed, distance, direction)
-
-                        # running move on the main thread will generate to error, as it will block rclpy.spin
-                        # self.move(linear_speed, distance, direction)
 
                     ## TODO: langchain sync up
                     # elif cmd['command'] == 'rotate':
@@ -179,6 +176,45 @@ class DroneController(Node):
                     #     is_clockwise = bool(cmd.get('is_clockwise', True))
                     #     self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
                         # self.rotate(angular_velocity, angle, is_clockwise)
+
+                else:
+                    
+                    if cmd["action"] == 'takeoff':
+                        print("Takeoff functionality")
+                        self.thread_executor.submit(self.takeoff)
+
+                    elif cmd["action"] == 'land':
+                        self.thread_executor.submit(self.land)
+                        
+                    elif cmd["action"] == 'stop':
+                        self.thread_executor.submit(self.stop)
+
+                    elif cmd["action"] == 'follow':
+                        self.thread_executor.submit(self.follow)
+
+                    elif cmd["action"] == 'unfollow':
+                        self.hovering = 1
+
+                    elif cmd["action"] == 'move':
+                        linear_speed = cmd["params"].get('linear_speed', 0.2)
+                        distance = cmd["params"].get('distance', 1.0)
+                        direction = cmd["params"].get('direction', "forward")
+
+                        print(f'linear_speed: {linear_speed}, distance: {distance}, direction: {direction}')
+                        
+                        # METHOD: Create a thread executor
+                        # we need to run the method on a different thread to avoid blocking rclpy.spin. 
+                        self.thread_executor.submit(self.move, linear_speed, distance, direction)
+
+
+
+                        ## TODO: langchain sync up
+                        # elif cmd['command'] == 'rotate':
+                        #     angular_velocity = cmd.get('angular_velocity', 1.0)
+                        #     angle = cmd.get('angle', 90.0)
+                        #     is_clockwise = bool(cmd.get('is_clockwise', True))
+                        #     self.thread_executor.submit(self.rotate, angular_velocity, angle, is_clockwise)
+                            # self.rotate(angular_velocity, angle, is_clockwise)
 
         except json.JSONDecodeError as e:
             logging.exception('[json.JSONDecodeError] Invalid or empty JSON string received: %s', msg.data)
