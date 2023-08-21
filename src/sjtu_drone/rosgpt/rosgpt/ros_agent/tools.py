@@ -1,22 +1,16 @@
-from kor import create_extraction_chain, from_pydantic
-from typing import Any, Optional, Type, Tuple
-from pydantic import BaseModel, Field
-from langchain.tools import BaseTool
-from langchain.callbacks.manager import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
-from langchain.chat_models.openai import ChatOpenAI
-from . import LLM
-import rclpy
-import threading
-from rclpy.node import Node
-from std_msgs.msg import String
-from rclpy.executors import SingleThreadedExecutor
-import rclpy
-from rclpy.node import Node
-from std_msgs.msg import String
-from geometry_msgs.msg import Pose
 import traceback
-import copy
+from typing import Optional, Tuple, Type
+
 import requests
+from kor import create_extraction_chain, from_pydantic
+from langchain.callbacks.manager import (AsyncCallbackManagerForToolRun,
+                                         CallbackManagerForToolRun)
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.tools import BaseTool
+from pydantic import BaseModel, Field
+
+from . import LLM
 
 
 class MoveParams(BaseModel):
@@ -242,3 +236,50 @@ class ComputeDroneMovements(BaseTool):
             z_axis_movement = f"The drone should move down {drone_z - poi_z} meters at {speed} meters per second"
 
         return x_axis_movement, y_axis_movement, z_axis_movement
+    
+class MultiLingualCommandInput(BaseModel):
+    command: str = Field(..., description="The command to translate.")
+
+class TranslateCommand(BaseTool):
+    name: str = "translate_command"
+    description: str = ("useful when the command is not in English and you want to translate it to English.")
+
+    args_schema: Type[BaseModel] = MultiLingualCommandInput
+
+    def _run(
+        self,
+        command: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        # This is an LLMChain to translate a command from any language to English
+        template = (
+            "Translate this command or sequence of commands to English: {command}"
+        )
+        prompt_template = PromptTemplate(input_variables=["command"], template=template)
+        tranlate_chain = LLMChain(llm=LLM, prompt=prompt_template)
+        translated_command = tranlate_chain(command)
+        return translated_command
+    
+class CommandInput(BaseModel):
+    command: str = Field(..., description="The command to execute.")
+
+class CheckCommandIsSafe(BaseTool):
+    name = "check_command_is_safe"
+    description = ("useful when you want to check if the command is safe to execute.")
+    args_schema: Type[BaseModel] = CommandInput
+
+    def _run(
+        self,
+        command: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        # This is an LLMChain to check if the command is safe to execute
+        template = (
+            "Check if this command or sequence of commands is safe to execute: {command}"
+        )
+        prompt_template = PromptTemplate(input_variables=["command"], template=template)
+        check_command_chain = LLMChain(llm=LLM, prompt=prompt_template)
+        is_safe = check_command_chain(command)
+        return is_safe

@@ -1,12 +1,18 @@
-from langchain.chat_models.openai import ChatOpenAI
 from langchain.agents import AgentType, initialize_agent, load_tools
+from langchain.chat_models.openai import ChatOpenAI
 from langchain.tools import StructuredTool
-from .tools import CustomCommandToJSON, RetrievePOICoordinates, GetDroneLocation, ComputeDroneMovements, PhraseClarifyingQuestion
+
 from . import LLM
+from .tools import (ComputeDroneMovements, CustomCommandToJSON,
+                    GetDroneLocation, PhraseClarifyingQuestion,
+                    RetrievePOICoordinates, TranslateCommand,
+                    CheckCommandIsSafe)
 
 
 def load_agent():
-    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English.
+    PREFIX = f"""You are an interpreter for a drone. You will be given a command in English. If the command is not in English, you should convert it.
+    THE DRONE MUST BE SAFE AT ALL TIMES. IF YOU ARE GIVEN A COMMAND THAT IS UNSAFE, RETURN A MESSAGE INFORMING THE USER THAT YOU CANNOT EXECUTE THE COMMAND DUE TO SAFETY CONCERNS.
+
     If what you are given is not a command, or is not relevant for managing the drone, you should ignore it return a message saying so.
     If there is anything that is unclear or ambiguous, you should ask for clarification.
 
@@ -34,35 +40,20 @@ def load_agent():
     
     If you're returning a message, just return the string.
 
-
-
-    As a reminder, you have access to the following tools:
-    
-
-    1. **command_to_json**: Converts a single explicit command into a JSON object suitable for a ROS agent. The command must be in English.
-
-    2. **retrieve_poi_coordinates**: Retrieves the coordinates of specified points of interest (POI), such as the `corn_garden` or the `tree_garden`.
-
-    3. **get_drone_location**: Retrieves the current location of the drone in the format (x, y, z). This tool is crucial when calculating drone movements required to reach specific locations like `corn_garden`, `tree_garden`, or `disaster site`.
-
-    4. **phrase_clarifying_question**: Useful when you need to ask a clarifying question about a phrase in the command.
-
-    5. **compute_drone_movements**: Computes the movements the drone should make to reach a specified location. The input is a list of coordinates and speed in the format: `[drone_x, drone_y, drone_z, poi_x, poi_y, poi_z, speed]`.
-
-    Remember that your main task is to understand the command, plan out the exact steps to execute it, use the tools to assist in command translation, and return a formatted JSON command array for the drone to execute. If a command is unclear, ask for clarification before proceeding.
-
+    You have access to the following tools:
     """
+
     FORMAT_INSTRUCTIONS = """Use the following format:
 
-    Command: the original command from the user
-    Plan: the entire plan regarding how you will decompose the command into discrete steps
+    Command: the original command from the user. If the command is not in English, you should translate it to English and treat that as the command.
+    Plan: the entire plan regarding how you will decompose the command into discrete steps, if it's not an unsafe command
     Thought: the thought process of the next action you will take
-    Action: the action to take, should be one of [{tool_names}]
+    Action: the action to take, should be one of [{tool_names}]. If it's an unsafe command, you should return a message saying so.
     Action Input: the input to the action
     Observation: the result of the action
     ... (this Thought/Action/Action Input/Observation should be repeated until the command(s) are ready to be sent to the drone)
     Thought: I have broken the command out into discrete steps and formatted each step into a JSON object.
-    Final Answer: An array of json objects to send to the drone
+    Final Answer: An array of json objects to send to the drone, or the final message to send to the user if the command is unsafe.
     
 
 
@@ -198,20 +189,15 @@ def load_agent():
 
 
     """
-
-    tools = load_tools(['human'], llm=LLM)
-    # TODO: if the response is non conclusive?
-    # if chatgpt_response and chatgpt_response.need_more_info:
-    #     # if you send this thing, next time the client will send an array of [text_command]
-    #     return {
-    #         'require_more_info': True,
-    #         'help_text': chatgpt_response.help_text
-    #     }
-    tools.append(CustomCommandToJSON())
-    tools.append(RetrievePOICoordinates())
-    tools.append(GetDroneLocation())
-    tools.append(ComputeDroneMovements())
-    tools.append(PhraseClarifyingQuestion())
+    tools = [
+        CustomCommandToJSON(),
+        RetrievePOICoordinates(),
+        GetDroneLocation(),
+        ComputeDroneMovements(),
+        PhraseClarifyingQuestion(),
+        TranslateCommand(),
+        CheckCommandIsSafe()
+    ]
 
     agent = initialize_agent(
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
