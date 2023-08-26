@@ -59,6 +59,9 @@ Melding ROS2-Humble, Gazebo, Next.js, and most critically, LangChain, our ROSGPT
 
 ## Demo and Video 📹
 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/hX7KutK7DyA" frameborder="0" allowfullscreen></iframe>
+
 [![image.png](https://i.postimg.cc/Gtd4k5D9/image.png)](https://www.youtube.com/watch?v=hX7KutK7DyA)
 
 
