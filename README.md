@@ -1,6 +1,10 @@
 
 # Drona 🤖✈️
 
+Video link: https://www.youtube.com/embed/hX7KutK7DyA
+
+[![image.png](https://i.postimg.cc/Gtd4k5D9/image.png)](https://www.youtube.com/watch?v=hX7KutK7DyA)
+
 
 ## Motivation
 
@@ -55,15 +59,6 @@ Central to our architecture is LangChain, an innovative framework designed to sp
 From crafting custom content, facilitating instantaneous translations, to bringing forth knowledgeable virtual assistants, LangChain emerges as the frontier of AI advancements. Even though it's evolving, the synergy it exhibits with LLMs is nudging the frontiers of what's achievable with AI across varied industries.
 
 Melding ROS2-Humble, Gazebo, Next.js, and most critically, LangChain, our ROSGPT system breaks conventional norms, presenting a futuristic solution in drone operation and interactivity.
-
-
-## Demo and Video 📹
-
-
-Video link: https://www.youtube.com/embed/hX7KutK7DyA
-
-[![image.png](https://i.postimg.cc/Gtd4k5D9/image.png)](https://www.youtube.com/watch?v=hX7KutK7DyA)
-
 
 
 ## Team 🫂
